@@ -5,7 +5,7 @@
 
 :: for user name and password is used ISC_USER and ISC_PASSWORD enviroment variables
 
-IF NOT DEFINED %ISQL% SET ISQL=isql.exe
+IF NOT DEFINED ISQL SET ISQL=isql.exe
 
 @PUSHD .
 @CD /D %~dp0
