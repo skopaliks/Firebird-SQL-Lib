@@ -3,7 +3,7 @@
 * Date    : 2017-08-13
 * Author  : Slavomir Skopalik
 * Server  : Firebird 2.5.7
-* Purpose : Ensure that sequence of triggers fireng is determinable
+* Purpose : Ensure that sequence of triggers firing is determinable
 *  
 * Revision History
 * ================
