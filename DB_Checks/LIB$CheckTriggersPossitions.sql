@@ -90,7 +90,7 @@ BEGIN
       ttp1 = 8196;
     END
     FOR SELECT RDB$Relation_Name, RDB$TRIGGER_SEQUENCE, LIST(TRIM(RDB$Trigger_Name)) FROM RDB$Triggers
-      WHERE RDB$System_Flag=0 AND RDB$Trigger_Type IN(:ttp1, :ttp2, :ttp3, :ttp4)
+      WHERE RDB$System_Flag=0 AND RDB$Trigger_Type IN(:ttp1, :ttp2, :ttp3, :ttp4) AND RDB$Trigger_Name NOT LIKE 'REPL$_%' 
       GROUP BY RDB$Relation_Name, RDB$TRIGGER_SEQUENCE
       HAVING COUNT(*)>1
       INTO :Relation_Name, :Pos, :tg_names DO BEGIN
