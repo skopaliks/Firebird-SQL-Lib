@@ -53,7 +53,7 @@ BEGIN
       WHEN 37 THEN 'VARCHAR'
       WHEN 261 THEN 'BLOB'
      END);
-  IF(DataType IS NULL)THEN EXCEPTION MASA$SystemException Field_Source || ' Is unknow data type';
+  IF(DataType IS NULL)THEN EXCEPTION LIB$CMP_Exception Field_Source || ' Is unknow data type';
   IF(ft IN(7,8,16))THEN BEGIN
     IF(st = 1)THEN DataType = 'NUMERIC(' || fpre || ',' || fscl || ')';
     IF(st = 2)THEN DataType = 'DECIMAL(' || fpre || ',' || fscl || ')';

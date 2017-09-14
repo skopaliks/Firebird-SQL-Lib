@@ -1,8 +1,18 @@
 -- Include all sql files
 
+-- General
 INPUT Domains\LIB$Domains.sql;
+-- Best practies
 INPUT DB_Checks\LIB$CheckTriggersPossitions.sql;
 COMMIT;
+-- Monitoring
 INPUT Utils\LIB$TR_Monitor.sql;
+COMMIT;
+-- IBReplicator
+-- DB compare
+INPUT Comparer\LIB$CMP_Exception.sql;
+INPUT Comparer\LIB$CMP_GetUserType.sql;
+INPUT Comparer\LIB$CMP_GetFieldDataType.sql;
+INPUT Comparer\LIB$CMP_Procedures.sql;
 
 COMMIT;
