@@ -47,6 +47,7 @@ BEGIN
     INTO :Procedure_Name, :blr_l, :In_cnt_l, :Out_cnt_l DO BEGIN
     blr_r = NULL;
     IsMissing = 0;
+    IsDifferent = 0;
     EXECUTE STATEMENT (:ds)(psn := :Procedure_Name)
         ON EXTERNAL DATA SOURCE Target_DB
         AS USER Targer_User
