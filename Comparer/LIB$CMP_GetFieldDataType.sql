@@ -15,10 +15,12 @@
 SET TERM ^;
 
 CREATE OR ALTER PROCEDURE LIB$CMP_GetFieldDataType(
-  Field_Source RDB$Field_Name NOT NULL
+  Field_Source      RDB$Field_Name NOT NULL,
+  Return_Basic_Type LIB$BooleanF DEFAULT 0
 )RETURNS(
   DataType VARCHAR(127),
-  DefaultExpresion TYPE OF COLUMN RDB$Fields.RDB$DEFAULT_Source
+  DefaultExpresion TYPE OF COLUMN RDB$Fields.RDB$DEFAULT_Source,
+  CheckExpresion   TYPE OF COLUMN RDB$Fields.RDB$VALIDATION_SOURCE
 )AS
 DECLARE ft SMALLINT;
 DECLARE st SMALLINT;         -- SUB_TYPE
@@ -28,16 +30,17 @@ DECLARE fpre SMALLINT;       -- Number of digit for DECIMAL and NUMERIC
 DECLARE fscl SMALLINT;       -- Field scale for DECIMAL and NUMERIC
 BEGIN
   -- Identify system domain
-  IF(NOT Field_Source LIKE 'RDB$_%')THEN BEGIN
+  IF(NOT Field_Source LIKE 'RDB$_%' AND Return_Basic_Type=0)THEN BEGIN
     DataType = Field_Source;
     SUSPEND;
     EXIT;
   END
   SELECT 
     RDB$FIELD_TYPE, RDB$FIELD_SUB_TYPE, RDB$SEGMENT_LENGTH, RDB$CHARACTER_LENGTH, RDB$FIELD_PRECISION, ABS(RDB$FIELD_SCALE),
-    RDB$DEFAULT_Source
+    RDB$DEFAULT_Source,
+    RDB$VALIDATION_SOURCE
     FROM RDB$Fields WHERE RDB$Field_Name = :Field_Source
-    INTO :ft, :st, :sl, :cl, :fpre, :fscl, :DefaultExpresion;
+    INTO :ft, :st, :sl, :cl, :fpre, :fscl, :DefaultExpresion, :CheckExpresion;
   DataType =
     -- Warn !!! CASE returned CHAR(xx)
     TRIM(CASE ft
