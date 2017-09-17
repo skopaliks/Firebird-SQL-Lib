@@ -20,9 +20,10 @@ CREATE OR ALTER PROCEDURE LIB$CMP_Procedures(
   Target_Password VARCHAR(63),
   Target_Role     VARCHAR(63) DEFAULT NULL
 )RETURNS(
-  Procedure_Name  RDB$Procedure_Name,
-  IsDifferent     SMALLINT,
-  IsMissing       SMALLINT
+  Procedure_Name         RDB$Procedure_Name,
+  IsDifferent            LIB$BooleanF,  -- returns 1 if declaration or body are different
+  IsDifferentDelaration  LIB$BooleanF,  -- returns 1 if declaration is different 
+  IsMissing              LIB$BooleanF  
 )AS
 DECLARE ds VARCHAR(500);
 DECLARE blr_l BLOB;
@@ -48,15 +49,20 @@ BEGIN
     blr_r = NULL;
     IsMissing = 0;
     IsDifferent = 0;
+    IsDifferentDelaration = 0;
     EXECUTE STATEMENT (:ds)(psn := :Procedure_Name)
         ON EXTERNAL DATA SOURCE Target_DB
         AS USER Targer_User
         PASSWORD Target_Password
+        ROLE Target_Role
         INTO :blr_r, :In_cnt_r, :Out_cnt_r;
     IF(blr_r IS NULL)THEN IsMissing = 1;
      ELSE BEGIN
       IF(blr_r <> blr_l)THEN IsDifferent = 1;
-      IF(In_cnt_l <> In_cnt_r OR Out_cnt_l <> Out_cnt_r)THEN IsDifferent = 1;
+      IF(In_cnt_l <> In_cnt_r OR Out_cnt_l <> Out_cnt_r)THEN BEGIN
+        IsDifferent = 1;
+        IsDifferentDelaration = 1;
+      END
     END
     IF(IsMissing = 0 AND IsDifferent = 0)THEN BEGIN
       -- BLR is same, but parameters can be different, now time to check it
