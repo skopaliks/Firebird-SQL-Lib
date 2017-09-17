@@ -58,7 +58,12 @@ BEGIN
     IF(st = 1)THEN DataType = 'NUMERIC(' || fpre || ',' || fscl || ')';
     IF(st = 2)THEN DataType = 'DECIMAL(' || fpre || ',' || fscl || ')';
   END
-  IF(ft IN(14,37)) THEN DataType = DataType || '('||cl||')';
+  IF(ft IN(14,37)) THEN BEGIN    
+    IF(ft=14 AND st=3)THEN
+      DataType = Field_Source; -- Not ducumented System data types like RDB$FIELD_NAME
+     ELSE 
+      DataType = DataType || '('||cl||')';
+  END
   IF(ft = 261) THEN DataType = DataType || ' SUB_TYPE ' || st || ' SEGMENT SIZE ' || sl;
   SUSPEND;
 END
