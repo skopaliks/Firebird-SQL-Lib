@@ -8,6 +8,8 @@ COMMIT;
 -- Monitoring
 INPUT Utils\LIB$TR_Monitor.sql;
 COMMIT;
+-- DDL
+INPUT DDL\LIB$DDL_Exception.sql;
 -- IBReplicator
 -- DB compare
 INPUT Comparer\LIB$CMP_Exception.sql;
