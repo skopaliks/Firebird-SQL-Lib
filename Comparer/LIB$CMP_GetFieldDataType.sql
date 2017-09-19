@@ -10,7 +10,7 @@
 * Revision History                                                           
 * ================                                                           
 * 2017-07-20 - S.Skopalik: Fixed returning DefaultExpresion                                                                           
-*                                                                            
+* 2017-09-17 - S.Skopalik: Added CheckExpresion                                                                            
 ******************************************************************************/
 SET TERM ^;
 
