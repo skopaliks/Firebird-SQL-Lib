@@ -12,6 +12,7 @@ COMMIT;
 INPUT DDL\LIB$DDL_Exception.sql;
 INPUT DDL\LIB$DDL_DropUnq.sql;
 -- IBReplicator
+INPUT IBReplicator\REPL$DDL.sql;
 -- DB compare
 INPUT Comparer\LIB$CMP_Exception.sql;
 INPUT Comparer\LIB$CMP_GetUserType.sql;
