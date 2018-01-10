@@ -8,6 +8,7 @@
 * Purpose : Log specific number of commited and also rollbacked transactions
 *
 * Revision History
+* 2018-01-10 - S.Skopalik:  Fixed bug in determining transaction isolation level
 ******************************************************************************/
 
 RECREATE Table LIB$Transactions_Log (
@@ -55,7 +56,7 @@ BEGIN
   new.Log_CURRENT_ROLE    = CURRENT_ROLE;
   new.Log_SESSION_ID      = CURRENT_CONNECTION;
   new.Log_TRANSACTION_ID  = CURRENT_TRANSACTION;
-  new.Log_ISOLATION_Mode  = RDB$GET_CONTEXT('SYSTEM', 'ISOLATION_LEVEL');
+  new.Log_ISOLATION_Mode  = (SELECT MON$ISOLATION_MODE FROM MON$TRANSACTIONS WHERE MON$TRANSACTION_ID = new.Log_TRANSACTION_ID);
   new.Log_REMOTE_PROCESS  = (SELECT MON$Remote_Process FROM MON$Attachments WHERE MON$ATTACHMENT_ID = CURRENT_CONNECTION);
   new.usr_msg             = RDB$Get_Context('USER_TRANSACTION','LIB$Transactions_Log_usr_msg');
 END
