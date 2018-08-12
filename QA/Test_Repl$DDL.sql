@@ -1,0 +1,30 @@
+-- Test REPL$DLL functionalisties
+
+CREATE TABLE dll_test(a INTEGER);
+
+SET TERM ^;
+
+EXECUTE BLOCK
+AS
+BEGIN
+  INSERT INTO dll_test VALUES(1);
+  INSERT INTO dll_test VALUES(2);
+  BEGIN
+    INSERT INTO dll_test VALUES('AA');
+  WHEN ANY DO BEGIN END
+  END
+END
+^
+
+ROLLBACK^
+
+EXECUTE BLOCK
+AS
+BEGIN
+  IF((SELECT COUNT(*) FROM dll_test)>0)THEN EXCEPTION LIB$DDL_Exception 'Test REPL$DLL failed';
+END
+^
+
+SET TERM ;^
+COMMIT;
+
