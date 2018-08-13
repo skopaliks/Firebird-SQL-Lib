@@ -8,11 +8,7 @@ INPUT c:\IBReplicator\config.sql;
 SET TERM ;^
 
 -- MasaUDFL: Sorry for that
-INPUT ..\masa\sql\masaudf\masaudf.sql;
-
-
-INPUT IncludeAll.sql;
-
+INPUT ..\..\masa\sql\masaudf\masaudf.sql;
 COMMIT;
 
 SET TERM ^;
@@ -34,4 +30,3 @@ COMMIT;
 GRANT RDB$ADMIN TO REPL_FB_Lib;
 COMMIT;
 
-INPUT QA/Test_Repl$DDL.sql;

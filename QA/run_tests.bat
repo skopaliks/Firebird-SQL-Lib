@@ -13,13 +13,12 @@
 
 @PUSHD .
 CD /D %~dp0
-CD ..
 
 SET DATABASE=Firebird-SQL-Lib-Test.fdb
 IF EXIST D:\fbdata SET DATABASE=D:\fbdata\%DATABASE%
 
 :: Try to drop a existing database
-%ISQL% -i QA\Drop_Test_DB.sql %DATABASE%
+%ISQL% -i Drop_Test_DB.sql %DATABASE%
 
 :: Create DB and add all DB objects
 SET cfile=%temp%\Firebird-SQL-Lib-Test-Create.sql
@@ -30,13 +29,18 @@ ECHO CREATE DATABASE '%DATABASE%' PAGE_SIZE 16384 DEFAULT CHARACTER SET UTF8; >>
 %ISQL% -b -e -charset UTF8 -i %cfile%
 @IF %ERRORLEVEL% NEQ 0 goto :end
 
-%ISQL% -b -e -i QA\Create_Test_DB.sql %DATABASE%
-@IF %ERRORLEVEL% NEQ 0 goto :end
-
 DEL %cfile%
 @IF %ERRORLEVEL% NEQ 0 goto :end
 
-%ISQL% -i QA\Drop_Test_DB.sql %DATABASE%
+%ISQL% -b -e -q -i Create_Test_DB.sql %DATABASE% >create.log
+@IF %ERRORLEVEL% NEQ 0 goto :end
+
+CALL ..\AddToDB.bat %DATABASE%
+
+%ISQL% -b -e -i Test_Repl$DDL.sql %DATABASE%
+@IF %ERRORLEVEL% NEQ 0 goto :end
+
+%ISQL% -i Drop_Test_DB.sql %DATABASE%
 @IF %ERRORLEVEL% NEQ 0 goto :end
 
 :end
