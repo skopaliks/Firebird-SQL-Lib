@@ -9,13 +9,17 @@
 
 @IF NOT DEFINED ISC_USER SET ISC_USER=sysdba
 @IF NOT DEFINED ISC_PASSWORD SET ISC_PASSWORD=masterkey
+:: FB2.5
 @IF NOT DEFINED ISQL SET ISQL=c:\fb\bin\isql.exe
+:: FB3.0
+@IF NOT EXIST %ISQL% SET ISQL=c:\fb\isql.exe
 
 @PUSHD .
 CD /D %~dp0
 
 SET DATABASE=Firebird-SQL-Lib-Test.fdb
 IF EXIST D:\fbdata SET DATABASE=D:\fbdata\%DATABASE%
+SET DATABASE=localhost:%DATABASE%
 
 :: Try to drop a existing database
 %ISQL% -i Drop_Test_DB.sql %DATABASE%
