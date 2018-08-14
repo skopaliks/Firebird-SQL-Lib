@@ -7,6 +7,7 @@
 * Purpose : 
 *
 * Revision History
+* 2018-08-14 - S.Skopalik   Fixed problem if exception after DDL is raised
 ******************************************************************************/
 
 CREATE OR ALTER EXCEPTION REPL$DLL_Disconnect 'Replication exception:Force but planned diconecting';
@@ -37,22 +38,32 @@ CREATE TABLE REPL$DDL(
     EXECUTE STATEMENT ds;
     ds = 'CREATE GENERATOR REPL$DDL_id';
     EXECUTE STATEMENT ds;
+    -- Execurted flag table  - DO NOT replicate this table
+    ds = 'CREATE TABLE REPL$DDL_EF( id INTEGER NOT NULL, CONSTRAINT REPL$DDL_EF_Pk PRIMARY KEY(id))';
+    EXECUTE STATEMENT ds;
   END
   ds = '
 CREATE OR ALTER TRIGGER REPL$DDL_BIU FOR REPL$DDL BEFORE INSERT OR UPDATE AS
-DECLARE Ex LIB$BooleanF;  -- Execute SQL
-DECLARE usr    VARCHAR(63);                          -- Admin User (see replication manual)
-DECLARE psw    VARCHAR(63);                          -- Admin password (see replication manual)
-DECLARE DBPath TYPE OF COLUMN Repl$Databases.DBPath; -- Source DB Name (full path including server name)
+DECLARE Ex        LIB$BooleanF;                         -- Execute SQL
+DECLARE usr       VARCHAR(63);                          -- Admin User (see replication manual)
+DECLARE psw       VARCHAR(63);                          -- Admin password (see replication manual)
+DECLARE DBPath    TYPE OF COLUMN Repl$Databases.DBPath; -- Source DB Name (full path including server name)
 DECLARE CurrentDB VARCHAR(1000);
 DECLARE RemoteDB  VARCHAR(1000);
-DECLARE ds VARCHAR(4000);
+DECLARE ds        VARCHAR(4000);
+DECLARE rflag     LIB$BooleanF = 0;                     -- Replication connection
 BEGIN
+  IF(Rdb$Get_Context(''USER_SESSION'',''DatabaseReplicationFlag'') IS NOT NULL) THEN rflag = 1;
   IF(INSERTING)THEN BEGIN
-    IF(new.id IS NULL)THEN new.id = NEXT VALUE FOR REPL$DDL_id;
-    IF(new.tDateUTC IS NULL)THEN new.tDateUTC = GetExactTimestampUTC();
-    IF(EXISTS(SELECT * FROM REPL$DDL WHERE id=new.id))THEN EXIT;
-    IF(new.TimeOut IS NULL)THEN new.TimeOut = 100; -- Default wait before kill 
+    -- No replication connection
+    IF(rflag = 0)THEN BEGIN
+      IF(new.id IS NULL)THEN new.id = NEXT VALUE FOR REPL$DDL_id;
+      IF(new.tDateUTC IS NULL)THEN new.tDateUTC = GetExactTimestampUTC();
+      IF(new.TimeOut IS NULL)THEN new.TimeOut = 100; -- Default wait before kill
+    END ELSE BEGIN
+      IF(EXISTS(SELECT * FROM REPL$DDL WHERE id=new.id))THEN EXIT;
+      IF(EXISTS(SELECT * FROM REPL$DDL_EF WHERE id=new.id))THEN EXIT;
+    END
     Ex = 1;
     IF(new.DBNO IS NOT NULL)THEN BEGIN      
       CurrentDB = (SELECT ComputerName()||'':''||MON$Database_Name FROM MON$Database);
@@ -70,18 +81,18 @@ BEGIN
         Sleep(new.TimeOut);
         DELETE FROM MON$ATTACHMENTS WHERE MON$ATTACHMENT_ID <> CURRENT_CONNECTION;
       END
-      IF(new.Disconnect_After>0)THEN BEGIN  -- Disconect will rolback transaction -> all action must be in separate one
-        IN AUTONOMOUS TRANSACTION DO BEGIN
-          EXECUTE STATEMENT new.SQL;
-          INSERT INTO REPL$DDL(id) VALUES(new.id);  -- Ensure that DDL will executed only one time
-        END
-        EXCEPTION REPL$DLL_Disconnect ''REPL$DDL.id:''||new.id;
-      END ELSE BEGIN
+      IF(rflag = 0)THEN BEGIN
         EXECUTE STATEMENT new.SQL;
-      END       
+      END ELSE BEGIN
+        IN AUTONOMOUS TRANSACTION DO BEGIN
+          -- Replication always execute in autonomous transation and mark in secondary table
+          EXECUTE STATEMENT new.SQL;
+          INSERT INTO REPL$DDL_EF(id) VALUES(new.id);  -- Ensure that DDL will executed only one time
+        END
+        -- Disconect will rolback transaction -> all action must be in separate one
+        IF(new.Disconnect_After>0)THEN EXCEPTION REPL$DLL_Disconnect ''REPL$DDL.id:''||new.id;  
+      END             
     END
-  END
-  IF(UPDATING)THEN BEGIN
   END
 END';
   EXECUTE STATEMENT ds;

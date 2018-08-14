@@ -1451,7 +1451,7 @@ SELECT RandG(3,3) FROM rdb$database;
 
                   RANDG 
 ======================= 
-      4.780354685690757 
+      2.850273684660435 
 
 SELECT Sleep(NULL) FROM rdb$database;
 
