@@ -8,6 +8,7 @@
 *
 * Revision History
 * 2018-08-14 - S.Skopalik   Fixed problem if exception after DDL is raised
+* 2018-08-24 - S.Skopalik   Replace INTEGER by UUID to be able to change metadata on any node
 ******************************************************************************/
 
 CREATE OR ALTER EXCEPTION REPL$DLL_Disconnect 'Replication exception:Force but planned diconecting';
@@ -23,7 +24,7 @@ BEGIN
   IF(NOT EXISTS(SELECT * FROM RDB$Relations WHERE RDB$Relation_Name='REPL$DDL'))THEN BEGIN
   ds = '
 CREATE TABLE REPL$DDL(
-  id               INTEGER NOT NULL,
+  id               LIB$UUID NOT NULL,
   DBNO             INTEGER,
   SQL              LIB$LargeText,
   TimeOut          SMALLINT NOT NULL,              -- Time after send Event and before hard kill in [ms]
@@ -36,10 +37,8 @@ CREATE TABLE REPL$DDL(
 )
 ';
     EXECUTE STATEMENT ds;
-    ds = 'CREATE GENERATOR REPL$DDL_id';
-    EXECUTE STATEMENT ds;
     -- Execurted flag table  - DO NOT replicate this table
-    ds = 'CREATE TABLE REPL$DDL_EF( id INTEGER NOT NULL, CONSTRAINT REPL$DDL_EF_Pk PRIMARY KEY(id))';
+    ds = 'CREATE TABLE REPL$DDL_EF(id LIB$UUID NOT NULL, CONSTRAINT REPL$DDL_EF_Pk PRIMARY KEY(id))';
     EXECUTE STATEMENT ds;
   END
   ds = '
@@ -57,7 +56,7 @@ BEGIN
   IF(INSERTING)THEN BEGIN
     -- No replication connection
     IF(rflag = 0)THEN BEGIN
-      IF(new.id IS NULL)THEN new.id = NEXT VALUE FOR REPL$DDL_id;
+      IF(new.id IS NULL)THEN new.id = GEN_UUID();
       IF(new.tDateUTC IS NULL)THEN new.tDateUTC = GetExactTimestampUTC();
       IF(new.TimeOut IS NULL)THEN new.TimeOut = 100; -- Default wait before kill
     END ELSE BEGIN

@@ -8,6 +8,7 @@
 *
 * Revision History
 * 2017-09-15 - S.Skopalik: LIB$LargeText added
+* 2018-08-23 - S.Skopalik: LIB$UUID added for storing UUID
 ******************************************************************************/
 
 -- because create or alter domain doesn't exist
@@ -37,6 +38,11 @@ BEGIN
   END
 -- Lib$BooleanF for FB2.5 boolean fields
   ds = 'Create Domain LIB$BooleanF As Smallint Default 0 Check (value BETWEEN 0 AND 1);';
+  BEGIN
+    EXECUTE STATEMENT ds;
+  WHEN ANY DO BEGIN END
+  END
+  ds = 'CREATE DOMAIN LIB$UUID AS CHAR(16) CHARACTER SET OCTETS';
   BEGIN
     EXECUTE STATEMENT ds;
   WHEN ANY DO BEGIN END
