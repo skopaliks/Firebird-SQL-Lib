@@ -19,6 +19,11 @@ INPUT IBReplicator\REPL$DDL.sql;
 INPUT Comparer\LIB$CMP_Exception.sql;
 INPUT Comparer\LIB$CMP_GetUserType.sql;
 INPUT Comparer\LIB$CMP_GetFieldDataType.sql;
+INPUT Comparer\LIB$CMP_GetTriggerType.sql;
+INPUT Comparer\LIB$CMP_Privileges.sql;
 INPUT Comparer\LIB$CMP_Procedures.sql;
+-- DB Compare extractors
+INPUT Comparer\LIB$CMP_ExtractProcedure.sql;
+INPUT Comparer\LIB$CMP_ExtractTrigger.sql;
 
 COMMIT;

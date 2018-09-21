@@ -44,6 +44,12 @@ CALL ..\AddToDB.bat %DATABASE%
 %ISQL% -b -e -i Test_Repl$DDL.sql %DATABASE%
 @IF %ERRORLEVEL% NEQ 0 goto :end
 
+%ISQL% -b -e -i Test_ExtractorProcedure.sql %DATABASE%
+@IF %ERRORLEVEL% NEQ 0 goto :end
+
+%ISQL% -b -e -i Test_ExtractorTrigger.sql %DATABASE%
+@IF %ERRORLEVEL% NEQ 0 goto :end
+
 %ISQL% -i Drop_Test_DB.sql %DATABASE%
 @IF %ERRORLEVEL% NEQ 0 goto :end
 

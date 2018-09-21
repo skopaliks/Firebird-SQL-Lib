@@ -9,7 +9,8 @@
 * Revision History                                                           
 * ================                                                           
 *                                                                            
-*                                                                            
+*
+* 2018/08/14 Jaroslav Kejnar - added usertype 0
 ******************************************************************************/
 SET TERM ^;
 
@@ -22,6 +23,7 @@ AS
 BEGIN
   UserType =
     TRIM(CASE RDB$USER_TYPE
+      WHEN 0 THEN 'TABLE'
       WHEN 2 THEN 'TRIGGER'
       WHEN 5 THEN 'PROCEDURE'
       WHEN 8 THEN 'USER'
