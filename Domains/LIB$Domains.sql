@@ -30,6 +30,11 @@ BEGIN
     EXECUTE STATEMENT ds;
   WHEN ANY DO BEGIN END
   END
+  ds = 'CREATE DOMAIN Lib$TimeSpan AS DOUBLE PRECISION;';
+  BEGIN
+    EXECUTE STATEMENT ds;
+  WHEN ANY DO BEGIN END
+  END
 -- Domain for larger UTF8 texts (like SQL DDL)
   ds = 'CREATE DOMAIN LIB$LargeText AS BLOB sub_type 1 segment size 2048 CHARACTER SET UTF8;';
   BEGIN
