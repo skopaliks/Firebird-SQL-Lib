@@ -40,6 +40,7 @@ DEL %cfile%
 @IF %ERRORLEVEL% NEQ 0 goto :end
 
 CALL ..\AddToDB.bat %DATABASE%
+@IF %ERRORLEVEL% NEQ 0 goto :end
 
 %ISQL% -b -e -i Test_Repl$DDL.sql %DATABASE%
 @IF %ERRORLEVEL% NEQ 0 goto :end
