@@ -12,6 +12,7 @@ COMMIT;
 
 -- DDL
 INPUT DDL\LIB$DDL_Exception.sql;
+INPUT DDL\LIB$DDL_DropPrimaryKey.sql;
 INPUT DDL\LIB$DDL_DropUnq.sql;
 INPUT DDL\LIB$DDL_Get_FK_Info.sql;
 COMMIT;
