@@ -21,6 +21,8 @@ COMMIT;
 INPUT IBReplicator\REPL$DBConnect.sql;
 INPUT IBReplicator\REPL$DDL.sql;
 COMMIT;
+INPUT IBReplicator\REPL$DDL_DropPrimaryKey.sql;
+COMMIT;
 
 -- DB compare
 INPUT Comparer\LIB$CMP_Exception.sql;
