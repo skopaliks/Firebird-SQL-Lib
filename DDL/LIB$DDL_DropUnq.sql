@@ -8,10 +8,11 @@
 *
 * Revision History
 * ================
+* 2018-10-24 - S.Skopalik   Added restriction NOT NULL for input parameters
 ******************************************************************************/
 SET TERM ^;
 
-CREATE OR ALTER PROCEDURE LIB$DDL_DropUnq(Relation RDB$Relation_Name, Field RDB$Field_Name, Exe Lib$BooleanF DEFAULT 0)
+CREATE OR ALTER PROCEDURE LIB$DDL_DropUnq(Relation RDB$Relation_Name NOT NULL, Field RDB$Field_Name NOT NULL, Exe Lib$BooleanF DEFAULT 0)
   RETURNS(SQL VARCHAR(512))
 AS
 DECLARE VARIABLE cn VARCHAR(500)=NULL;
