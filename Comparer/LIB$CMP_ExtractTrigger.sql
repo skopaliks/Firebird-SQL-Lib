@@ -22,15 +22,15 @@ CREATE OR ALTER PROCEDURE LIB$CMP_ExtractTrigger(TriggerName RDB$Trigger_Name NO
   IsComment LIB$BooleanF   -- Now is returning trigger description
 )
 AS
-DECLARE CRLF      LIB$CRLF;
-DECLARE trigger_type SMALLINT;
-DECLARE trigger_inactive SMALLINT;
-DECLARE trigger_sequence SMALLINT;
-DECLARE Source    LIB$LargeText;
-DECLARE usr       TYPE OF COLUMN RDB$User_Privileges.RDB$User;
-DECLARE priv      TYPE OF COLUMN RDB$User_Privileges.RDB$Privilege;
-DECLARE usr_t     VARCHAR(63);
-DECLARE dsc       TYPE OF COLUMN RDB$Triggers.RDB$DESCRIPTION;
+DECLARE CRLF                    LIB$CRLF;
+DECLARE trigger_type            TYPE OF COLUMN RDB$Triggers.RDB$TRIGGER_TYPE;
+DECLARE trigger_inactive        TYPE OF COLUMN RDB$Triggers.RDB$TRIGGER_INACTIVE;
+DECLARE trigger_sequence        TYPE OF COLUMN RDB$Triggers.RDB$TRIGGER_SEQUENCE;
+DECLARE Source                  LIB$LargeText;
+DECLARE usr                     TYPE OF COLUMN RDB$User_Privileges.RDB$User;
+DECLARE priv                    TYPE OF COLUMN RDB$User_Privileges.RDB$Privilege;
+DECLARE usr_t                   VARCHAR(63);
+DECLARE dsc                     TYPE OF COLUMN RDB$Triggers.RDB$DESCRIPTION;
 BEGIN
   -- Extract trigger header
   DDL = 'CREATE OR ALTER TRIGGER '|| TRIM(TriggerName);

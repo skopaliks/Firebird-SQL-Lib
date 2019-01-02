@@ -12,7 +12,7 @@
 ******************************************************************************/
 
 -- helper temporary table
-RECREATE GLOBAL TEMPORARY TABLE CMP_i_Privileges(
+RECREATE GLOBAL TEMPORARY TABLE LIB$CMP_i_Privileges(
   Privilege_User    RDB$User,
   Privilege_Grantor CHAR(31),
   Privilege_Object  RDB$Relation_Name,
@@ -23,7 +23,7 @@ RECREATE GLOBAL TEMPORARY TABLE CMP_i_Privileges(
   Object_Type       RDB$Object_Type
 )ON COMMIT DELETE ROWS;
 
-CREATE INDEX CMP_i_Privileges_indx ON CMP_i_Privileges(Privilege_User, Privilege_Grantor, Privilege_Object, Privilege, Grant_Option, Field_Name, User_Type, Object_Type);
+CREATE INDEX LIB$CMP_i_Privileges_indx ON LIB$CMP_i_Privileges(Privilege_User, Privilege_Grantor, Privilege_Object, Privilege, Grant_Option, Field_Name, User_Type, Object_Type);
 
 SET TERM ^;
 
@@ -47,7 +47,7 @@ DECLARE p_field_name TYPE OF COLUMN RDB$User_Privileges.RDB$Field_Name;
 DECLARE p_user_type TYPE OF COLUMN RDB$User_Privileges.RDB$User_Type;
 DECLARE p_object_type TYPE OF COLUMN RDB$User_Privileges.RDB$Object_Type;
 BEGIN
-  DELETE FROM CMP_i_Privileges;
+  DELETE FROM LIB$CMP_i_Privileges;
   ds = 'SELECT RDB$User, RDB$Grantor, RDB$Relation_Name, RDB$Privilege, COALESCE(RDB$Grant_Option, 0), RDB$Field_Name, RDB$User_Type, RDB$Object_Type FROM RDB$User_Privileges';
   IF(On_Grant IS NOT NULL OR To_Grant IS NOT NULL)THEN BEGIN
      ds = ds || ' WHERE ';
@@ -66,7 +66,7 @@ BEGIN
             ROLE Target_Role
     INTO :p_user, :p_grantor, :p_object, :p_privilege, :p_grant_option, :p_field_name, :p_user_type, :p_object_type
     DO BEGIN
-        INSERT INTO CMP_i_Privileges (Privilege_User, Privilege_Grantor, Privilege_Object, Privilege, Grant_Option, Field_Name, User_Type, Object_Type)
+        INSERT INTO LIB$CMP_i_Privileges (Privilege_User, Privilege_Grantor, Privilege_Object, Privilege, Grant_Option, Field_Name, User_Type, Object_Type)
             VALUES(:p_user, :p_grantor, :p_object, :p_privilege, :p_grant_option, :p_field_name, :p_user_type, :p_object_type);
     END
 END^
@@ -116,7 +116,7 @@ BEGIN
         IsMissing = 0;
         SELECT UserType FROM LIB$CMP_GetUserType(:p_user_type) INTO :User_Type;
         SELECT UserType FROM LIB$CMP_GetUserType(CAST(:p_object_type AS TYPE OF COLUMN RDB$User_Privileges.RDB$User_Type)) INTO :Object_Type;
-        IF(NOT EXISTS(SELECT * FROM CMP_i_Privileges
+        IF(NOT EXISTS(SELECT * FROM LIB$CMP_i_Privileges
                         WHERE Privilege_User = :Privilege_User AND
                             Privilege_Grantor = :Privilege_Grantor AND
                             Privilege_Object = :Privilege_Object AND
@@ -132,7 +132,7 @@ BEGIN
     NotExistsInCurrentDB = 1;
    FOR
     SELECT Privilege_User, Privilege_Grantor, Privilege_Object, Privilege, COALESCE(Grant_Option, 0), Field_Name, User_Type, Object_Type
-        FROM CMP_i_Privileges
+        FROM LIB$CMP_i_Privileges
     INTO :Privilege_User, :Privilege_Grantor, :Privilege_Object, :Privilege, :Grant_Option, :Field_Name, :p_user_type, :p_object_type
     DO BEGIN
         IF(NOT EXISTS(SELECT * FROM RDB$User_Privileges
