@@ -9,6 +9,7 @@
 * Revision History
 * 2018-08-14 - S.Skopalik   Fixed problem if exception after DDL is raised
 * 2018-08-24 - S.Skopalik   Replace INTEGER by UUID to be able to change metadata on any node
+* 2019-02-26 - S.Skopalik   Solve issue with so long SQL
 ******************************************************************************/
 
 CREATE OR ALTER EXCEPTION REPL$DLL_Disconnect 'Replication exception:Force but planned diconecting';
@@ -52,6 +53,7 @@ DECLARE RemoteDB  VARCHAR(1000);
 DECLARE ds        VARCHAR(4000);
 DECLARE rflag     LIB$BooleanF = 0;                     -- Replication connection
 BEGIN
+  LogToFile(SUBSTRING(new.SQL FROM 1 FOR 2000));
   IF(Rdb$Get_Context(''USER_SESSION'',''DatabaseReplicationFlag'') IS NOT NULL) THEN rflag = 1;
   IF(INSERTING)THEN BEGIN
     -- No replication connection
