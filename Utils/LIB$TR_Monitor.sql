@@ -9,19 +9,20 @@
 *
 * Revision History
 * 2018-01-10 - S.Skopalik:  Fixed bug in determining transaction isolation level
+* 2019-03-26 - S.Skopalik:  Fixed problem when  (SELECT MON$ISOLATION_MODE FROM MON$TRANSACTIONS WHERE MON$TRANSACTION_ID = new.Log_TRANSACTION_ID) returns NULL
 ******************************************************************************/
 
 RECREATE Table LIB$Transactions_Log (
-	bDateUTC            Lib$TimestampUTC NOT NULL,  -- When transaction start
-  eDateUTC            Lib$TimestampUTC NOT NULL,  -- When transaction finished
-  RollBacked          SMALLINT         NOT NULL,
-	Log_REMOTE_PROTOCOL VARCHAR(10)      NOT NULL,
-  Log_REMOTE_ADDRESS  VARCHAR(255)     NOT NULL,
+    bDateUTC            Lib$TimestampUTC NOT NULL,  -- When transaction start
+    eDateUTC            Lib$TimestampUTC NOT NULL,  -- When transaction finished
+    RollBacked          SMALLINT         NOT NULL,
+    Log_REMOTE_PROTOCOL VARCHAR(10)      NOT NULL,
+    Log_REMOTE_ADDRESS  VARCHAR(255)     NOT NULL,
 	Log_CURRENT_USER    VARCHAR(31)      NOT NULL,
 	Log_CURRENT_ROLE    VARCHAR(31)      NOT NULL,
 	Log_SESSION_ID      BIGINT           NOT NULL,
 	Log_TRANSACTION_ID  BIGINT           NOT NULL,
-	Log_ISOLATION_Mode  SMALLINT         NOT NULL,
+	Log_ISOLATION_Mode  SMALLINT,                   -- In some cases (FB2.5.8), it can be NULL
 	Log_REMOTE_PROCESS  VARCHAR(255),
 	usr_msg             VARCHAR(511)                -- For debuging, use context variable 'USER_TRANSACTION'.'LIB$Transactions_Log_usr_msg'
 );
