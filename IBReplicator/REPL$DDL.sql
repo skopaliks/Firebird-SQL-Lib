@@ -77,10 +77,12 @@ BEGIN
       new.Msg = new.Msg||'' ''||CurrentDB;
     END
     IF(Ex>0)THEN BEGIN
-      IN AUTONOMOUS TRANSACTION DO POST_EVENT(''REPL$METADATA_CHANGE'');
-      IF(new.Kill_Connections>0)THEN BEGIN      
+      IF(new.Kill_Connections>0)THEN BEGIN
+        IN AUTONOMOUS TRANSACTION DO POST_EVENT(''REPL$METADATA_CHANGE'');      
         Sleep(new.TimeOut);
         DELETE FROM MON$ATTACHMENTS WHERE MON$ATTACHMENT_ID <> CURRENT_CONNECTION;
+      END ELSE BEGIN
+        POST_EVENT(''REPL$METADATA_CHANGE'');
       END
       IF(rflag = 0)THEN BEGIN
         EXECUTE STATEMENT new.SQL;
