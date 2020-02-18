@@ -31,6 +31,7 @@ INPUT Comparer\LIB$CMP_GetFieldDataType.sql;
 INPUT Comparer\LIB$CMP_GetTriggerType.sql;
 INPUT Comparer\LIB$CMP_Privileges.sql;
 INPUT Comparer\LIB$CMP_Procedures.sql;
+INPUT Comparer\LIB$CMP_Tables.sql;
 -- DB Compare extractors
 INPUT Comparer\LIB$CMP_ExtractProcedure.sql;
 INPUT Comparer\LIB$CMP_ExtractTrigger.sql;
