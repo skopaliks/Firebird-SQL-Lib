@@ -11,7 +11,7 @@
 
 PUSHD .
 CD /D %~dp0
-
+DEL %1
 :: Complete SQL code
 @ECHO --Create DB diff for replication cluster>%incsql%
 @ECHO SELECT RDB$SET_CONTEXT('USER_SESSION','DB_Target', '%DATABASE_TARGET%') FROM RDB$DATABASE; >>%incsql%
