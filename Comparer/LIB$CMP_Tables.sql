@@ -9,7 +9,7 @@
 *                                                                               
 * Revision History                                                           
 * ================                                                           
-*                                                                            
+* 2020-03-05 - S.Skopalik   Fixed field position calculation, exclude views from comparision                                                                        
 ******************************************************************************/
 SET TERM ^;
 ^
@@ -34,18 +34,18 @@ CREATE OR ALTER PROCEDURE LIB$CMP_Tables(
 DECLARE t_Rel   RDB$Relation_Name;
 DECLARE t_Field RDB$Field_Name;
 BEGIN
-  FOR SELECT R.RDB$Relation_Name, RF.RDB$FIELD_NAME, RF.RDB$FIELD_POSITION, COALESCE(RF.RDB$NULL_FLAG,0), RF.RDB$FIELD_SOURCE
+  FOR SELECT R.RDB$Relation_Name, RF.RDB$FIELD_NAME, RF.RDB$FIELD_POSITION + 1, COALESCE(RF.RDB$NULL_FLAG,0), RF.RDB$FIELD_SOURCE
     FROM RDB$Relations R
     LEFT JOIN Rdb$Relation_Fields RF ON RF.rdb$Relation_Name = R.RDB$Relation_Name
     LEFT JOIN RDB$Fields F ON F.RDB$FIELD_NAME=RF.RDB$FIELD_SOURCE
-    WHERE F.RDB$COMPUTED_BLR IS NULL
+    WHERE F.RDB$COMPUTED_BLR IS NULL AND  (R.RDB$RELATION_TYPE=0 OR R.RDB$RELATION_TYPE IS NULL)
     ORDER BY R.RDB$Relation_Name, RF.RDB$FIELD_POSITION
     INTO Table_Name, Field_Name, Field_Pos, Field_null, Field_Source DO BEGIN
       t_Rel = NULL;
       t_Field = NULL;
       Field_Pos_Target = NULL;
       EXECUTE STATEMENT (
-        'SELECT R.RDB$Relation_Name, RF.RDB$FIELD_NAME, RF.RDB$FIELD_POSITION
+        'SELECT R.RDB$Relation_Name, RF.RDB$FIELD_NAME, RF.RDB$FIELD_POSITION + 1
          FROM RDB$Relations R
          LEFT JOIN Rdb$Relation_Fields RF ON RF.rdb$Relation_Name = R.RDB$Relation_Name AND RF.RDB$FIELD_NAME = :fn
          WHERE R.rdb$Relation_Name = :rn'
