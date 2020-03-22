@@ -25,10 +25,13 @@ INPUT IBReplicator\REPL$DDL_DropPrimaryKey.sql;
 COMMIT;
 
 -- DB compare
+-- Support routines
 INPUT Comparer\LIB$CMP_Exception.sql;
 INPUT Comparer\LIB$CMP_GetUserType.sql;
 INPUT Comparer\LIB$CMP_GetFieldDataType.sql;
 INPUT Comparer\LIB$CMP_GetTriggerType.sql;
+-- Objects comparer
+INPUT Comparer\LIB$CMP_Domains.sql;
 INPUT Comparer\LIB$CMP_Privileges.sql;
 INPUT Comparer\LIB$CMP_Procedures.sql;
 INPUT Comparer\LIB$CMP_Tables.sql;

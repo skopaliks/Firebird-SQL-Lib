@@ -20,7 +20,8 @@ CREATE OR ALTER PROCEDURE LIB$CMP_Domains(
 )RETURNS(
   Domain_Name            RDB$Field_Name,
   IsDifferent            LIB$BooleanF, 
-  IsMissing              LIB$BooleanF  
+  IsMissing              LIB$BooleanF,
+  Field_Type             VARCHAR(300)
 )AS
 DECLARE ds VARCHAR(500);
 DECLARE blr_v_l BLOB; -- RDB$VALIDATION_BLR
@@ -38,20 +39,21 @@ BEGIN
     INTO :Domain_Name, :blr_v_l, :blr_c_l, :blr_d_l, :ft_l DO BEGIN
     IsDifferent = 0;
     IsMissing = 0;
-    ft_l = NULL;
+    ft_r = NULL;
     EXECUTE STATEMENT (:ds)(fn := :Domain_Name)
         ON EXTERNAL DATA SOURCE Target_DB
         AS USER Targer_User
         PASSWORD Target_Password
         ROLE Target_Role
         INTO :blr_v_r, :blr_c_r, :blr_d_r, :ft_r;
-    IF(ft_l IS NULL)THEN IsMissing = 1;
+    IF(ft_r IS NULL)THEN IsMissing = 1;
      ELSE BEGIN
       IF(blr_v_l IS DISTINCT FROM blr_v_r)THEN IsDifferent = 1;
       IF(blr_c_l IS DISTINCT FROM blr_c_r)THEN IsDifferent = 1;
       IF(blr_d_l IS DISTINCT FROM blr_d_r)THEN IsDifferent = 1;
       IF(ft_l IS DISTINCT FROM ft_r)THEN IsDifferent = 1;
     END
+    Field_Type = (SELECT DataType FROM LIB$CMP_GetFieldDataType(:Domain_Name, 1));
     SUSPEND;
   END
 END
