@@ -10,7 +10,8 @@
 * Revision History                                                           
 * ================                                                           
 * 2017-07-20 - S.Skopalik: Fixed returning DefaultExpresion                                                                           
-* 2017-09-17 - S.Skopalik: Added CheckExpresion                                                                            
+* 2017-09-17 - S.Skopalik: Added CheckExpresion
+* 2020-03-22 - S.Skopalik: Added charcter set into DataType definition
 ******************************************************************************/
 SET TERM ^;
 
@@ -25,9 +26,10 @@ CREATE OR ALTER PROCEDURE LIB$CMP_GetFieldDataType(
 DECLARE ft SMALLINT;
 DECLARE st SMALLINT;         -- SUB_TYPE
 DECLARE sl SMALLINT;
-DECLARE cl SMALLINT;         -- Char length
-DECLARE fpre SMALLINT;       -- Number of digit for DECIMAL and NUMERIC
-DECLARE fscl SMALLINT;       -- Field scale for DECIMAL and NUMERIC
+DECLARE cl     SMALLINT;     -- Char length
+DECLARE chrset SMALLINT;     -- Character Set id
+DECLARE fpre   SMALLINT;     -- Number of digit for DECIMAL and NUMERIC
+DECLARE fscl   SMALLINT;     -- Field scale for DECIMAL and NUMERIC
 BEGIN
   -- Identify system domain
   IF(NOT Field_Source LIKE 'RDB$_%' AND Return_Basic_Type=0)THEN BEGIN
@@ -37,10 +39,9 @@ BEGIN
   END
   SELECT 
     RDB$FIELD_TYPE, RDB$FIELD_SUB_TYPE, RDB$SEGMENT_LENGTH, RDB$CHARACTER_LENGTH, RDB$FIELD_PRECISION, ABS(RDB$FIELD_SCALE),
-    RDB$DEFAULT_Source,
-    RDB$VALIDATION_SOURCE
+    RDB$DEFAULT_Source, RDB$VALIDATION_SOURCE, RDB$CHARACTER_SET_ID
     FROM RDB$Fields WHERE RDB$Field_Name = :Field_Source
-    INTO :ft, :st, :sl, :cl, :fpre, :fscl, :DefaultExpresion, :CheckExpresion;
+    INTO :ft, :st, :sl, :cl, :fpre, :fscl, :DefaultExpresion, :CheckExpresion, :chrset;
   DataType =
     -- Warn !!! CASE returned CHAR(xx)
     TRIM(CASE ft
@@ -61,11 +62,14 @@ BEGIN
     IF(st = 1)THEN DataType = 'NUMERIC(' || fpre || ',' || fscl || ')';
     IF(st = 2)THEN DataType = 'DECIMAL(' || fpre || ',' || fscl || ')';
   END
-  IF(ft IN(14,37)) THEN BEGIN    
+  IF(ft IN(14,37)) THEN BEGIN  -- CHAR and VARCHAR
     IF(ft=14 AND st=3)THEN
       DataType = Field_Source; -- Not ducumented System data types like RDB$FIELD_NAME
      ELSE 
       DataType = DataType || '('||cl||')';
+    IF(chrset IS NOT NULL)THEN BEGIN
+      DataType = DataType ||' CHARACTER SET '||(SELECT RDB$CHARACTER_SET_NAME FROM RDB$CHARACTER_Sets WHERE RDB$CHARACTER_SET_ID = :chrset);
+    END
   END
   IF(ft = 261) THEN DataType = DataType || ' SUB_TYPE ' || st || ' SEGMENT SIZE ' || sl;
   SUSPEND;
