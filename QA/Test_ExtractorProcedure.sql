@@ -13,7 +13,7 @@ BEGIN
     EXCEPTION LIB$CMP_Exception 'Not extracted expected comments.';
   IF((SELECT COUNT(*) FROM Lib$Cmp_ExtractProcedure('LIB$CMP_PRIVILEGES', 0) WHERE isComment = 1 AND DDL STARTS WITH 'COMMENT ON PROCEDURE LIB$CMP_PRIVILEGES') = 0) THEN
     EXCEPTION LIB$CMP_Exception 'Not extracted procedure comment.';
-  IF((SELECT COUNT(*) FROM Lib$Cmp_ExtractProcedure('LIB$CMP_PRIVILEGES', 0) WHERE isComment = 1 AND DDL STARTS WITH 'COMMENT ON PARAMETER LIB$CMP_PRIVILEGES.') = 0) THEN
+  IF((SELECT COUNT(*) FROM Lib$Cmp_ExtractProcedure('LIB$CMP_PRIVILEGES', 0) WHERE isComment = 1 AND DDL STARTS WITH 'COMMENT ON PARAMETER LIB$CMP_PRIVILEGES') = 0) THEN
     EXCEPTION LIB$CMP_Exception 'Not extracted parameter comment.';
   IF((SELECT COUNT(*) FROM Lib$Cmp_ExtractProcedure('LIB$CMP_PRIVILEGES', 0) WHERE isGrant = 1) = 0) THEN
     EXCEPTION LIB$CMP_Exception 'Not extracted expected grant statements.';
