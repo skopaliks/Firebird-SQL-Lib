@@ -8,7 +8,7 @@
 *
 * Revision History
 * ================
-
+* 2020-04-30 S.Skopalik - Fixed too many spaces in trigger comments 
 ******************************************************************************/
 SET TERM ^;
 
@@ -78,7 +78,7 @@ BEGIN
   -- Extract trigger comment
   IF(:dsc IS NOT NULL)THEN BEGIN
     IsComment = 1;
-    DDL = 'COMMENT ON TRIGGER ' || :TriggerName || ' IS ''' || :dsc || '''';
+    DDL = 'COMMENT ON TRIGGER ' || TRIM(:TriggerName) || ' IS ''' || :dsc || '''';
     SUSPEND;
   END
   IsComment = 0;
