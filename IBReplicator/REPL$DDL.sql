@@ -10,6 +10,7 @@
 * 2018-08-14 - S.Skopalik   Fixed problem if exception after DDL is raised
 * 2018-08-24 - S.Skopalik   Replace INTEGER by UUID to be able to change metadata on any node
 * 2019-02-26 - S.Skopalik   Solve issue with so long SQL
+* 2020-07-09 - S.Skopalik   Fixed situation that target node is not avaliable
 ******************************************************************************/
 
 CREATE OR ALTER EXCEPTION REPL$DLL_Disconnect 'Replication exception:Force but planned diconecting';
@@ -38,7 +39,7 @@ CREATE TABLE REPL$DDL(
 )
 ';
     EXECUTE STATEMENT ds;
-    -- Execurted flag table  - DO NOT replicate this table
+    -- Already executed commands flag table  - DO NOT replicate this table
     ds = 'CREATE TABLE REPL$DDL_EF(id LIB$UUID NOT NULL, CONSTRAINT REPL$DDL_EF_Pk PRIMARY KEY(id))';
     EXECUTE STATEMENT ds;
   END
@@ -69,8 +70,13 @@ BEGIN
     IF(new.DBNO IS NOT NULL)THEN BEGIN      
       CurrentDB = (SELECT ComputerName()||'':''||MON$Database_Name FROM MON$Database);
       SELECT UPPER(DB.DBPath), DB.Adminuser, Ibr_Decodepassword(DB.Adminpassword) FROM Repl$Databases DB WHERE DB.DBNo = new.DBNo INTO :DBPath, :usr, :psw;
-      ds = ''SELECT ComputerName()||'''':''''||MON$Database_Name FROM MON$Database'';      
-      EXECUTE STATEMENT ds ON EXTERNAL DBPath AS USER usr PASSWORD psw INTO :RemoteDB;      
+      ds = ''SELECT ComputerName()||'''':''''||MON$Database_Name FROM MON$Database'';
+      BEGIN      
+        EXECUTE STATEMENT ds ON EXTERNAL DBPath AS USER usr PASSWORD psw INTO :RemoteDB;
+        WHEN ANY DO BEGIN
+          RemoteDB = '''';                                -- In case that connection cannot be established, it is not this node
+        END
+      END      
       IF(RemoteDB IS DISTINCT FROM CurrentDB)THEN Ex=0;      
       new.Msg = GetExactTimestampUTC()||'' '';
       IF(Ex>0)THEN new.Msg = new.Msg||''Node Matched''; ELSE new.Msg = new.Msg||''Node Skipped'';
