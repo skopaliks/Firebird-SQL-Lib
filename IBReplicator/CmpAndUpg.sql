@@ -6,6 +6,7 @@ DECLARE db    VARCHAR(500);
 DECLARE tbl   VARCHAR(128);
 DECLARE fld   VARCHAR(128);
 DECLARE fsd   VARCHAR(200);
+DECLARE ft    VARCHAR(200);
 DECLARE fnull SMALLINT;
 DECLARE pos   INTEGER;
 BEGIN
@@ -15,12 +16,12 @@ BEGIN
   line = '-- Target DB:'||db;
   SUSPEND;
   -- Add Missing fields into existing tables
-  FOR SELECT TRIM(Table_Name), TRIM(Field_Name), TRIM(Field_Source), Field_Null FROM  LIB$CMP_Tables(:db, 'sysdba', 'masterkey')
+  FOR SELECT TRIM(Table_Name), TRIM(Field_Name), TRIM(Field_Source), Field_Type, Field_Null FROM  LIB$CMP_Tables(:db, 'sysdba', 'masterkey')
   WHERE IsFieldMissing = 1 AND IsTableMissing = 0
-  INTO tbl, fld, fsd, fnull DO BEGIN
+  INTO tbl, fld, fsd, ft, fnull DO BEGIN
     line = '';
     SUSPEND;
-    line = 'INSERT INTO Repl$DDL(SQL)SELECT ''ALTER TABLE '||tbl||' ADD '||fld||' '||fsd||''' FROM rdb$database';
+    line = 'INSERT INTO Repl$DDL(SQL)SELECT ''ALTER TABLE '||tbl||' ADD '||fld||' '||ft||''' FROM rdb$database';
     SUSPEND;
     line = '  WHERE NOT EXISTS(SELECT * FROM Rdb$Relation_Fields RF WHERE RF.rdb$Relation_Name = '''||tbl||''' AND RF.RDB$FIELD_NAME = '''||fld||''');'; 
     SUSPEND;

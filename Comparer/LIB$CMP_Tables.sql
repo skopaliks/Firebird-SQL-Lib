@@ -9,7 +9,8 @@
 *                                                                               
 * Revision History                                                           
 * ================                                                           
-* 2020-03-05 - S.Skopalik   Fixed field position calculation, exclude views from comparision                                                                        
+* 2020-03-05 - S.Skopalik   Fixed field position calculation, exclude views from comparision
+* 2020-07-22 - S.Skopalik   Added FieldType
 ******************************************************************************/
 SET TERM ^;
 ^
@@ -28,19 +29,21 @@ CREATE OR ALTER PROCEDURE LIB$CMP_Tables(
   Field_null_Target SMALLINT,
   Field_Source      RDB$Field_Name,
   Field_Source_Target RDB$Field_Name,
+  Field_Type        VARCHAR(127),  
   IsTableMissing    LIB$BooleanF,
   IsFieldMissing    LIB$BooleanF
 )AS
 DECLARE t_Rel   RDB$Relation_Name;
 DECLARE t_Field RDB$Field_Name;
 BEGIN
-  FOR SELECT R.RDB$Relation_Name, RF.RDB$FIELD_NAME, RF.RDB$FIELD_POSITION + 1, COALESCE(RF.RDB$NULL_FLAG,0), RF.RDB$FIELD_SOURCE
+  FOR SELECT R.RDB$Relation_Name, RF.RDB$FIELD_NAME, RF.RDB$FIELD_POSITION + 1, COALESCE(RF.RDB$NULL_FLAG,0), RF.RDB$FIELD_SOURCE, FT.DataType
     FROM RDB$Relations R
     LEFT JOIN Rdb$Relation_Fields RF ON RF.rdb$Relation_Name = R.RDB$Relation_Name
     LEFT JOIN RDB$Fields F ON F.RDB$FIELD_NAME=RF.RDB$FIELD_SOURCE
+    LEFT JOIN LIB$CMP_GetFieldDataType(RF.RDB$FIELD_SOURCE) FT ON 1=1
     WHERE F.RDB$COMPUTED_BLR IS NULL AND  (R.RDB$RELATION_TYPE=0 OR R.RDB$RELATION_TYPE IS NULL)
     ORDER BY R.RDB$Relation_Name, RF.RDB$FIELD_POSITION
-    INTO Table_Name, Field_Name, Field_Pos, Field_null, Field_Source DO BEGIN
+    INTO Table_Name, Field_Name, Field_Pos, Field_null, Field_Source, Field_Type DO BEGIN
       t_Rel = NULL;
       t_Field = NULL;
       Field_Pos_Target = NULL;
