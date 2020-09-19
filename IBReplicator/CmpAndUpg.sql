@@ -9,6 +9,7 @@ DECLARE fsd   VARCHAR(200);
 DECLARE ft    VARCHAR(200);
 DECLARE fnull SMALLINT;
 DECLARE pos   INTEGER;
+DECLARE Last_Tbl VARCHAR(128);
 BEGIN
   db = RDB$GET_CONTEXT('USER_SESSION','DB_Target');
   line = '-- Generated at '||LOCALTIMESTAMP;
@@ -42,7 +43,27 @@ BEGIN
     line = 'EXECUTE PROCEDURE MASA$UpdateBussinesObjects(UPPER('''||tbl||''')); COMMIT;';
     SUSPEND;
   END
-  
+  Last_Tbl = '';
+  FOR SELECT TRIM(Table_Name), TRIM(Field_Name), TRIM(Field_Source), Field_Type, Field_Null FROM  LIB$CMP_Tables(:db, 'sysdba', 'masterkey')
+  WHERE IsFieldMissing = 1 AND IsTableMissing = 1
+  INTO tbl, fld, fsd, ft, fnull DO BEGIN
+    line = '';
+    IF(Last_Tbl = tbl)THEN line = ',';
+    IF(Last_Tbl <> tbl)THEN BEGIN
+      IF(Last_Tbl <> '')THEN BEGIN
+        line = ')'');';
+        SUSPEND;
+      END
+      line = 'INSERT INTO Repl$DDL(SQL)SELECT ''CREATE TABLE '||tbl||'(';
+      Last_Tbl = tbl;
+    END
+    line = line || fld || ' ' ||ft ||IIF(fnull=1, ' NOT NULL', '');
+    SUSPEND;
+  END
+  IF(Last_Tbl <> '')THEN BEGIN
+    line = ')'');';
+    SUSPEND;
+  END
   -- Update field position
   fsd = '';
   FOR SELECT TRIM(Table_Name), TRIM(Field_Name), field_pos FROM  LIB$CMP_Tables(:db, 'sysdba', 'masterkey')
