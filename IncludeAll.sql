@@ -21,6 +21,7 @@ COMMIT;
 -- IBReplicator
 INPUT IBReplicator\REPL$DBConnect.sql;
 INPUT IBReplicator\REPL$SetCurrentDBNo.sql;
+COMMIT;
 INPUT IBReplicator\REPL$DDL.sql;
 COMMIT;
 INPUT IBReplicator\REPL$DDL_DropForeignKey.sql;

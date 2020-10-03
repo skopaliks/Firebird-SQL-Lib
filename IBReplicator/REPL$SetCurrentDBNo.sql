@@ -12,7 +12,7 @@
 ******************************************************************************/
 
 SET TERM ^;
-CREATE OR ALTER PROCEDURE REPL$SetCurrentDBNo(Relation RDB$Relation_Name NOT NULL)  
+CREATE OR ALTER PROCEDURE REPL$SetCurrentDBNo  
 AS
 DECLARE CurrentDB VARCHAR(1000);
 DECLARE RemoteDB  VARCHAR(1000);

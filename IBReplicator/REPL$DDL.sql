@@ -67,17 +67,9 @@ BEGIN
       IF(EXISTS(SELECT * FROM REPL$DDL_EF WHERE id=new.id))THEN EXIT;
     END
     Ex = 1;
-    IF(new.DBNO IS NOT NULL)THEN BEGIN      
-      CurrentDB = (SELECT ComputerName()||'':''||MON$Database_Name FROM MON$Database);
-      SELECT UPPER(DB.DBPath), DB.Adminuser, Ibr_Decodepassword(DB.Adminpassword) FROM Repl$Databases DB WHERE DB.DBNo = new.DBNo INTO :DBPath, :usr, :psw;
-      ds = ''SELECT ComputerName()||'''':''''||MON$Database_Name FROM MON$Database'';
-      BEGIN      
-        EXECUTE STATEMENT ds ON EXTERNAL DBPath AS USER usr PASSWORD psw INTO :RemoteDB;
-        WHEN ANY DO BEGIN
-          RemoteDB = '''';                                -- In case that connection cannot be established, it is not this node
-        END
-      END      
-      IF(RemoteDB IS DISTINCT FROM CurrentDB)THEN Ex=0;      
+    IF(new.DBNO IS NOT NULL)THEN BEGIN
+      EXECUTE PROCEDURE REPL$SetCurrentDBNo;
+      IF(CAST(new.DBNO AS VARCHAR(12)) IS DISTINCT FROM Rdb$Get_Context(''USER_SESSION'',''REPL$CURRENTDBNO''))THEN Ex=0;
       new.Msg = GetExactTimestampUTC()||'' '';
       IF(Ex>0)THEN new.Msg = new.Msg||''Node Matched''; ELSE new.Msg = new.Msg||''Node Skipped'';
       new.Msg = new.Msg||'' ''||CurrentDB;
