@@ -26,6 +26,7 @@ INPUT IBReplicator\REPL$DDL.sql;
 COMMIT;
 INPUT IBReplicator\REPL$DDL_DropForeignKey.sql;
 INPUT IBReplicator\REPL$DDL_DropPrimaryKey.sql;
+INPUT IBReplicator\REPL$DDL_DropUnq.sql;
 COMMIT;
 
 -- DB compare
