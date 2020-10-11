@@ -34,7 +34,7 @@ BEGIN
       SUSPEND;
   END
   IF(consName IS NULL AND NoExceptions = 0)THEN 
-    EXCEPTION LIB$DDL_Exception 'Cannot fond unique constrant(s) for table('||TRIM(Relation)||') and field('||TRIM(Field)||')';
+    EXCEPTION LIB$DDL_Exception 'Cannot found unique constrant(s) for table('||TRIM(Relation)||') and field('||TRIM(Field)||')';
 END
 ^
 
