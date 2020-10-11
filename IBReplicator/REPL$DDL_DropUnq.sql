@@ -16,7 +16,7 @@ CREATE OR ALTER PROCEDURE REPL$DDL_DropUnq(Relation RDB$Relation_Name NOT NULL, 
 AS
 BEGIN
   INSERT INTO Repl$DDL(Kill_Connections, Disconnect_After, SQL)
-    SELECT 1, 1, SQL FROM LIB$DDL_DropUnq(:Relation, :Field, 1, 1);
+    SELECT 1, 1, SQL FROM LIB$DDL_DropUnq(:Relation, :Field, 0, 1);
 END
 ^
 
