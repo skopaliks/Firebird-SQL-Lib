@@ -86,9 +86,12 @@ END
 CREATE OR ALTER TRIGGER LIB$TR_Monitor_Rollback ACTIVE ON TRANSACTION ROLLBACK POSITION 32761
 AS
 BEGIN
-  IF(RDB$Get_Context('USER_TRANSACTION','LIB$Transactions_Log_bDateUTC') IS NOT NULL)THEN
-    IN AUTONOMOUS TRANSACTION DO
+  IF(RDB$Get_Context('USER_TRANSACTION', 'LIB$Transactions_Log_bDateUTC') IS NOT NULL)THEN
+    IN AUTONOMOUS TRANSACTION DO BEGIN
       INSERT INTO LIB$Transactions_Log(Rollbacked) VALUES(1);
+      -- Disable insert operation in commit
+      RDB$Set_Context('USER_TRANSACTION', 'LIB$Transactions_Log_bDateUTC', NULL);
+    END
 END
 ^
 
