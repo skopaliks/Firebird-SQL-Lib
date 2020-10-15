@@ -46,6 +46,7 @@ END
 CREATE OR ALTER TRIGGER LIB$Transactions_Log_BI FOR LIB$Transactions_Log
 ACTIVE BEFORE INSERT POSITION 2
 AS
+DECLARE tril VARCHAR(20);
 BEGIN
   -- Just to pass Elekt Labs replication check
   -- IF(Rdb$Get_Context('USER_SESSION','DatabaseReplicationFlag') IS NOT NULL) THEN EXIT;
@@ -57,8 +58,11 @@ BEGIN
   new.Log_CURRENT_ROLE    = CURRENT_ROLE;
   new.Log_SESSION_ID      = CURRENT_CONNECTION;
   new.Log_TRANSACTION_ID  = CURRENT_TRANSACTION;
-  new.Log_ISOLATION_Mode  = (SELECT MON$ISOLATION_MODE FROM MON$TRANSACTIONS WHERE MON$TRANSACTION_ID = new.Log_TRANSACTION_ID);
-  new.Log_REMOTE_PROCESS  = (SELECT MON$Remote_Process FROM MON$Attachments WHERE MON$ATTACHMENT_ID = CURRENT_CONNECTION);
+  tril = RDB$GET_CONTEXT('SYSTEM', 'ISOLATION_LEVEL');
+  IF(tril = 'CONSISTENCY')    THEN new.Log_ISOLATION_Mode = 0;
+  IF(tril = 'SNAPSHOT')       THEN new.Log_ISOLATION_Mode = 1;
+  IF(tril = 'READ COMMITTED') THEN new.Log_ISOLATION_Mode = 2;
+  new.Log_REMOTE_PROCESS  = RDB$GET_CONTEXT('SYSTEM', 'CLIENT_PROCESS');
   new.usr_msg             = RDB$Get_Context('USER_TRANSACTION','LIB$Transactions_Log_usr_msg');
 END
 ^
