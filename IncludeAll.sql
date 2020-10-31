@@ -11,6 +11,7 @@ INPUT Utils\LIB$TR_Monitor.sql;
 COMMIT;
 
 -- DDL
+INPUT DDL\LIB$DDL_ChangeDataType.sql;
 INPUT DDL\LIB$DDL_Exception.sql;
 INPUT DDL\LIB$DDL_DropForeignKey.sql;
 INPUT DDL\LIB$DDL_DropPrimaryKey.sql;

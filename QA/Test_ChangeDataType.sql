@@ -1,0 +1,10 @@
+CREATE TABLE CDT(
+   id INTEGER
+);
+
+SELECT * FROM LIB$DDL_ChangeDataType('CDT', 'ID', 'SMALLINT', 0);
+
+SELECT * FROM LIB$DDL_ChangeDataType('CDT', 'ID', 'SMALLINT', 1);
+
+SHOW TABLE CDT;
+
