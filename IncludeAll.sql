@@ -10,6 +10,17 @@ COMMIT;
 INPUT Utils\LIB$TR_Monitor.sql;
 COMMIT;
 
+-- Support routines
+INPUT Comparer\LIB$CMP_Exception.sql;
+INPUT Comparer\LIB$CMP_GetUserType.sql;
+INPUT Comparer\LIB$CMP_GetFieldDataType.sql;
+INPUT Comparer\LIB$CMP_GetTriggerType.sql;
+
+-- DB Compare extractors
+INPUT Comparer\LIB$CMP_ExtractProcedure.sql;
+INPUT Comparer\LIB$CMP_ExtractTrigger.sql;
+COMMIT;
+
 -- DDL
 INPUT DDL\LIB$DDL_ChangeDataType.sql;
 INPUT DDL\LIB$DDL_Exception.sql;
@@ -31,18 +42,10 @@ INPUT IBReplicator\REPL$DDL_DropUnq.sql;
 COMMIT;
 
 -- DB compare
--- Support routines
-INPUT Comparer\LIB$CMP_Exception.sql;
-INPUT Comparer\LIB$CMP_GetUserType.sql;
-INPUT Comparer\LIB$CMP_GetFieldDataType.sql;
-INPUT Comparer\LIB$CMP_GetTriggerType.sql;
 -- Objects comparer
 INPUT Comparer\LIB$CMP_Domains.sql;
 INPUT Comparer\LIB$CMP_Privileges.sql;
 INPUT Comparer\LIB$CMP_Procedures.sql;
 INPUT Comparer\LIB$CMP_Tables.sql;
--- DB Compare extractors
-INPUT Comparer\LIB$CMP_ExtractProcedure.sql;
-INPUT Comparer\LIB$CMP_ExtractTrigger.sql;
 
 COMMIT;
