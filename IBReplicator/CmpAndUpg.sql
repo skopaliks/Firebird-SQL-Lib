@@ -7,9 +7,11 @@ DECLARE tbl   VARCHAR(128);
 DECLARE fld   VARCHAR(128);
 DECLARE fsd   VARCHAR(200);
 DECLARE ft    VARCHAR(200);
-DECLARE fnull SMALLINT;
-DECLARE pos   INTEGER;
+DECLARE fnull    SMALLINT;
+DECLARE pos      INTEGER;
 DECLARE Last_Tbl VARCHAR(128);
+DECLARE UserName VARCHAR(64) = 'sysdba';
+DECLARE UserPass VARCHAR(64) = 'masterkey';
 BEGIN
   db = RDB$GET_CONTEXT('USER_SESSION','DB_Target');
   line = '-- Generated at '||LOCALTIMESTAMP;
@@ -64,9 +66,16 @@ BEGIN
     line = ')'');';
     SUSPEND;
   END
+  -- Adjust NOT NULL flag
+  FOR SELECT TRIM(Table_Name), TRIM(Field_Name), TRIM(Field_Source), Field_Null FROM  LIB$CMP_Tables(:db, 'sysdba', 'masterkey')
+    WHERE IsFieldMissing = 0 AND IsTableMissing = 0 AND Field_Null <> Field_null_Target
+    INTO tbl, fld, fsd, fnull DO BEGIN
+    line = 'EXECUTE PROCEDURE MASA$Set_Null_Flag('''||tbl||''', '''||fld||''', '||fNull||');';
+    SUSPEND;
+  END
   -- Update field position
   fsd = '';
-  FOR SELECT TRIM(Table_Name), TRIM(Field_Name), field_pos FROM  LIB$CMP_Tables(:db, 'sysdba', 'masterkey')
+  FOR SELECT TRIM(Table_Name), TRIM(Field_Name), field_pos FROM  LIB$CMP_Tables(:db, :UserName, :UserPass)
   WHERE field_pos <> field_pos_target
   ORDER BY Table_Name, field_pos
   INTO tbl, fld, pos DO BEGIN
