@@ -63,7 +63,7 @@ BEGIN
     SUSPEND;
   END
   IF(Last_Tbl <> '')THEN BEGIN
-    line = ')'');';
+    line = ')'' FROM RDB$Database WHERE NOT EXISTS(SELECT * FROM RDB$Relations WHERE RDB$Relation_Name = '''||tbl||''') ;';
     SUSPEND;
   END
   -- Adjust NOT NULL flag
