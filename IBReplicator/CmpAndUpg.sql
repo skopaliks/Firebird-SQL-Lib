@@ -53,7 +53,7 @@ BEGIN
     IF(Last_Tbl = tbl)THEN line = ',';
     IF(Last_Tbl <> tbl)THEN BEGIN
       IF(Last_Tbl <> '')THEN BEGIN
-        line = ')'');';
+        line = ')'' FROM RDB$Database WHERE NOT EXISTS(SELECT * FROM RDB$Relations WHERE RDB$Relation_Name = '''||Last_Tbl||''') ;';
         SUSPEND;
       END
       line = 'INSERT INTO Repl$DDL(SQL)SELECT ''CREATE TABLE '||tbl||'(';
@@ -63,7 +63,7 @@ BEGIN
     SUSPEND;
   END
   IF(Last_Tbl <> '')THEN BEGIN
-    line = ')'' FROM RDB$Database WHERE NOT EXISTS(SELECT * FROM RDB$Relations WHERE RDB$Relation_Name = '''||tbl||''') ;';
+    line = ')'' FROM RDB$Database WHERE NOT EXISTS(SELECT * FROM RDB$Relations WHERE RDB$Relation_Name = '''||Last_Tbl||''') ;';
     SUSPEND;
   END
   -- Adjust NOT NULL flag
