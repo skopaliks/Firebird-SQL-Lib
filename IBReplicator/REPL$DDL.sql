@@ -11,6 +11,7 @@
 * 2018-08-24 - S.Skopalik   Replace INTEGER by UUID to be able to change metadata on any node
 * 2019-02-26 - S.Skopalik   Solve issue with so long SQL
 * 2020-07-09 - S.Skopalik   Fixed situation that target node is not avaliable
+* 2020-12-27 - S.Skopalik   Fixed message mallformated string in case UTF8 connection
 ******************************************************************************/
 
 CREATE OR ALTER EXCEPTION REPL$DLL_Disconnect 'Replication exception:Force but planned diconecting';
@@ -91,7 +92,7 @@ BEGIN
           INSERT INTO REPL$DDL_EF(id) VALUES(new.id);  -- Ensure that DDL will executed only one time
         END
         -- Disconect will rolback transaction -> all action must be in separate one
-        IF(new.Disconnect_After>0)THEN EXCEPTION REPL$DLL_Disconnect ''REPL$DDL.id:''||new.id;  
+        IF(new.Disconnect_After>0)THEN EXCEPTION REPL$DLL_Disconnect ''REPL$DDL.id:''||UUID_TO_CHAR(new.id);  
       END             
     END
   END
