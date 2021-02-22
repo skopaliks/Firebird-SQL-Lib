@@ -1,8 +1,5 @@
 -- Install all necesary DB object
 
--- Firebird UDF
-INPUT c:/fb/udf/fbudf.sql;
-
 -- IBReplicator config
 INPUT c:\IBReplicator\config.sql;
 SET TERM ;^
