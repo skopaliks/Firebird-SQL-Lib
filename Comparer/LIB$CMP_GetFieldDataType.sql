@@ -12,6 +12,7 @@
 * 2017-07-20 - S.Skopalik: Fixed returning DefaultExpresion                                                                           
 * 2017-09-17 - S.Skopalik: Added CheckExpresion
 * 2020-03-22 - S.Skopalik: Added charcter set into DataType definition
+* 2022-09-10 - S.Skopalik: Added BOOLEAN, INT128, TIME WITH WITH TIME ZONE and TIMESTAMP WITH WITH TIME ZONE data type
 ******************************************************************************/
 SET TERM ^;
 
@@ -52,12 +53,16 @@ BEGIN
       WHEN 13 THEN 'TIME'
       WHEN 14 THEN 'CHAR'
       WHEN 16 THEN 'BIGINT'
+      WHEN 23 THEN 'BOOLEAN'
+      WHEN 26 THEN 'INT128'
       WHEN 27 THEN 'DOUBLE PRECISION'
+      WHEN 28 THEN 'TIME WITH TIME ZONE'
+      WHEN 29 THEN 'TIMESTAMP WITH WITH TIME ZONE'
       WHEN 35 THEN 'TIMESTAMP'
       WHEN 37 THEN 'VARCHAR'
       WHEN 261 THEN 'BLOB'
      END);
-  IF(DataType IS NULL)THEN EXCEPTION LIB$CMP_Exception Field_Source || ' Is unknow data type';
+  IF(DataType IS NULL)THEN EXCEPTION LIB$CMP_Exception Field_Source || ' Is unknow data type for field type '||ft;
   IF(ft IN(7,8,16))THEN BEGIN
     IF(st = 1)THEN DataType = 'NUMERIC(' || fpre || ',' || fscl || ')';
     IF(st = 2)THEN DataType = 'DECIMAL(' || fpre || ',' || fscl || ')';
