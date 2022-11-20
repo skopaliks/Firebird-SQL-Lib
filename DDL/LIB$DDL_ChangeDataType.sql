@@ -9,7 +9,7 @@
 * Revision History
 * ================
 * 2020-11-01 - S.Skopalik    In case of dependency then empty procedure bodies
-* 2022-11-20 - S.Skopalik    Add isDML flag to distinguish between DDL and DML statements
+* 2022-11-20 - S.Skopalik    Add isDML flag to distinguish between DDL and DML statements, extend SQL length
 ******************************************************************************/
 
 -- Altering support procedures
@@ -22,7 +22,7 @@ CREATE OR ALTER PROCEDURE LIB$DDL_ChangeDataType(
   Exe            Lib$BooleanF DEFAULT 0,
   DropDependency Lib$BooleanF DEFAULT 0
 )RETURNS(
-  SQL    VARCHAR(512),
+  SQL    LIB$LargeText,
   isDML  Lib$BooleanF
 )
 AS
