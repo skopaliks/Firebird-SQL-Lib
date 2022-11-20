@@ -9,6 +9,7 @@
 * Revision History
 * ================
 * 2020-11-01 - S.Skopalik    In case of dependency then empty procedure bodies
+* 2022-11-20 - S.Skopalik    Add isDML flag to distinguish between DDL and DML statements
 ******************************************************************************/
 
 -- Altering support procedures
@@ -21,7 +22,8 @@ CREATE OR ALTER PROCEDURE LIB$DDL_ChangeDataType(
   Exe            Lib$BooleanF DEFAULT 0,
   DropDependency Lib$BooleanF DEFAULT 0
 )RETURNS(
-  SQL VARCHAR(512)
+  SQL    VARCHAR(512),
+  isDML  Lib$BooleanF
 )
 AS
 DECLARE tName VARCHAR(128);
@@ -32,6 +34,7 @@ DECLARE isRep SMALLINT;  -- Flag that replication flag is already sets
 DECLARE D_Name VARCHAR(128);
 DECLARE D_Type VARCHAR(128); 
 BEGIN
+  isDML = 0;
   IF(DropDependency>0)THEN BEGIN
     FOR SELECT T.rdb$Type_Name, D.rdb$Dependent_Name FROM RDB$Dependencies D, RDB$Types T
       WHERE D.rdb$depended_on_name = :RelationName AND D.rdb$field_name = :FieldName
@@ -53,9 +56,11 @@ BEGIN
   SQL = 'ALTER TABLE '||TRIM(RelationName)||' ADD ' || TRIM(FieldName) || ' ' || NewDataType;
   SUSPEND;
   sql2 = SQL;
+  isDML = 1;
   SQL = 'UPDATE '||TRIM(RelationName)||' SET ' || FieldName || ' = ' || tName;
   SUSPEND;
   sql3 = SQL;
+  isDML = 0;
   SQL = 'ALTER TABLE ' || TRIM(RelationName) || ' DROP ' || tName;
   SUSPEND;
   IF(Exe>0)THEN BEGIN
