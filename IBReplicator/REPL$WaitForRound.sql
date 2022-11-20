@@ -10,7 +10,7 @@
 *   
 * Revision History
 * ================
-*
+* 2022-11-20  SkopalikS    Fixed bug in non replicated commands condition
 ******************************************************************************/
 SET TERM ^;
 CREATE OR ALTER PROCEDURE Repl$WaitForRound(
@@ -33,7 +33,7 @@ BEGIN
   EntriesProcessed = 0;
   ElapsedTime = ((GetExactTimestampUTC()-bDate)*24*3600*1000);
   SUSPEND;
-  WHILE(EntriesToProcess>1)DO BEGIN
+  WHILE(EntriesToProcess > 0)DO BEGIN
     Sleep(ScanTime);
     IN AUTONOMOUS TRANSACTION DO BEGIN
       EXECUTE STATEMENT 'SELECT MAX(SeqNo), COUNT(*) FROM Repl$log WHERE SeqNo<='||sqm INTO sqm, cnt;
