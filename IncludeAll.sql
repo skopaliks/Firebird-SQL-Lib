@@ -31,12 +31,13 @@ INPUT DDL\LIB$DDL_Get_FK_Info.sql;
 COMMIT;
 
 -- IBReplicator
-INPUT IBReplicator\REPL$WaitForRound.sql;
 INPUT IBReplicator\REPL$DBConnect.sql;
 INPUT IBReplicator\REPL$SetCurrentDBNo.sql;
+INPUT IBReplicator\REPL$WaitForRound.sql;
 COMMIT;
 INPUT IBReplicator\REPL$DDL.sql;
 COMMIT;
+INPUT IBReplicator\REPL$DDL_ChangeDataType.sql;
 INPUT IBReplicator\REPL$DDL_DropForeignKey.sql;
 INPUT IBReplicator\REPL$DDL_DropPrimaryKey.sql;
 INPUT IBReplicator\REPL$DDL_DropUnq.sql;
