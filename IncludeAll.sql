@@ -31,6 +31,7 @@ INPUT DDL\LIB$DDL_Get_FK_Info.sql;
 COMMIT;
 
 -- IBReplicator
+INPUT IBReplicator\REPL$WaitForRound.sql;
 INPUT IBReplicator\REPL$DBConnect.sql;
 INPUT IBReplicator\REPL$SetCurrentDBNo.sql;
 COMMIT;
