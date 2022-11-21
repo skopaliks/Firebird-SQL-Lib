@@ -8,7 +8,7 @@
 *                                                                               
 * Revision History                                                           
 * ================                                                           
-*                                                                            
+* 2022-11-21  SkopalikS    Fixed bug in AFTER UPDATE OR DELETE                                                                           
 *                                                                            
 ******************************************************************************/
 SET TERM ^;
@@ -35,7 +35,7 @@ BEGIN
       WHEN 27 THEN 'BEFORE UPDATE OR DELETE'
       WHEN 28 THEN 'AFTER UPDATE OR DELETE'
       WHEN 113 THEN 'BEFORE INSERT OR UPDATE OR DELETE'
-      WHEN 114 THEN 'AFTER OR UPDATE OR DELETE'
+      WHEN 114 THEN 'AFTER UPDATE OR DELETE'
       WHEN 8192 THEN 'ON CONNECT'
       WHEN 8193 THEN 'ON DISCONNECT'
       WHEN 8194 THEN 'ON TRANSACTION START'
