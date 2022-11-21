@@ -11,7 +11,6 @@
 * 
 ******************************************************************************/
 
--- Altering support procedures
 SET TERM ^;
 
 CREATE OR ALTER PROCEDURE REPL$DDL_ChangeDataType(
@@ -25,10 +24,8 @@ DECLARE n INTEGER;
 BEGIN
   FOR SELECT isDML, SQL FROM LIB$DDL_ChangeDataType(:RelationName, :FieldName, :NewDataType, 0, :DropDependency) AS CURSOR C1 DO BEGIN
     IF(C1.isDML > 0)THEN BEGIN
-      SELECT COUNT(*) FROM Repl$WaitForRound(500) INTO n;
-      IN AUTONOMOUS TRANSACTION DO BEGIN
-        EXECUTE STATEMENT C1.SQL;
-      END
+      SELECT COUNT(*) FROM Repl$WaitForRound(500) INTO n;      
+      EXECUTE STATEMENT C1.SQL WITH AUTONOMOUS TRANSACTION;      
     END ELSE BEGIN
       IN AUTONOMOUS TRANSACTION DO BEGIN
         INSERT INTO Repl$DDL(SQL) VALUES(C1.SQL);
