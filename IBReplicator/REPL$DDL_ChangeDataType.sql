@@ -8,7 +8,7 @@
 *
 * Revision History
 * ================
-* 
+* 2022-11-22  SkopalikS   Set replication flag for DML
 ******************************************************************************/
 
 SET TERM ^;
@@ -21,7 +21,10 @@ CREATE OR ALTER PROCEDURE REPL$DDL_ChangeDataType(
 )
 AS
 DECLARE n INTEGER;
+DECLARE isRep SMALLINT;  -- Replication flag is already sets
 BEGIN
+  isRep = Rdb$Get_Context('USER_SESSION','DatabaseReplicationFlag');
+  IF(isRep IS NULL)THEN Rdb$Set_Context('USER_SESSION','DatabaseReplicationFlag', 1);
   FOR SELECT isDML, SQL FROM LIB$DDL_ChangeDataType(:RelationName, :FieldName, :NewDataType, 0, :DropDependency) AS CURSOR C1 DO BEGIN
     IF(C1.isDML > 0)THEN BEGIN
       SELECT COUNT(*) FROM Repl$WaitForRound(500) INTO n;      
@@ -32,6 +35,7 @@ BEGIN
       END
     END
   END
+  IF(isRep IS NULL)THEN Rdb$Set_Context('USER_SESSION','DatabaseReplicationFlag', NULL);
 END
 ^
 
