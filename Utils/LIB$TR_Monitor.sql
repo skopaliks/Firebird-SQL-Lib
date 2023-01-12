@@ -10,15 +10,17 @@
 * Revision History
 * 2018-01-10 - S.Skopalik:  Fixed bug in determining transaction isolation level
 * 2019-03-26 - S.Skopalik:  Fixed problem when  (SELECT MON$ISOLATION_MODE FROM MON$TRANSACTIONS WHERE MON$TRANSACTION_ID = new.Log_TRANSACTION_ID) returns NULL
+* 2023-01-12 - S.Skopalik:  Added Log_RealUserId for application user id tracing
 ******************************************************************************/
 
 RECREATE Table LIB$Transactions_Log (
-    bDateUTC            Lib$TimestampUTC NOT NULL,  -- When transaction start
-    eDateUTC            Lib$TimestampUTC NOT NULL,  -- When transaction finished
+    bDateUTC            Lib$TimestampUTC NOT NULL, 
+    eDateUTC            Lib$TimestampUTC NOT NULL, 
     RollBacked          SMALLINT         NOT NULL,
     Log_REMOTE_PROTOCOL VARCHAR(10)      NOT NULL,
     Log_REMOTE_ADDRESS  VARCHAR(255)     NOT NULL,
 	Log_CURRENT_USER    VARCHAR(31)      NOT NULL,
+    Log_RealUserId      INTEGER,
 	Log_CURRENT_ROLE    VARCHAR(31)      NOT NULL,
 	Log_SESSION_ID      BIGINT           NOT NULL,
 	Log_TRANSACTION_ID  BIGINT           NOT NULL,
@@ -26,6 +28,10 @@ RECREATE Table LIB$Transactions_Log (
 	Log_REMOTE_PROCESS  VARCHAR(255),
 	usr_msg             VARCHAR(511)                -- For debuging, use context variable 'USER_TRANSACTION'.'LIB$Transactions_Log_usr_msg'
 );
+
+COMMENT ON COLUMN LIB$Transactions_Log.bDateUTC IS 'When transaction start';
+COMMENT ON COLUMN LIB$Transactions_Log.eDateUTC IS 'When transaction finished';
+COMMENT ON COLUMN LIB$Transactions_Log.Log_RealUserId IS 'Used in case that application user is not connected user. Application have to fill context variable ''USER_TRANSACTION''.''REALUSERID''';
 
 GRANT INSERT ON LIB$Transactions_Log TO PUBLIC;
 
@@ -55,6 +61,7 @@ BEGIN
   new.Log_REMOTE_PROTOCOL = RDB$GET_CONTEXT('SYSTEM', 'NETWORK_PROTOCOL');
   new.Log_REMOTE_ADDRESS  = RDB$GET_CONTEXT('SYSTEM', 'CLIENT_ADDRESS');
   new.Log_CURRENT_USER    = CURRENT_USER;
+  new.Log_RealUserId      = RDB$GET_CONTEXT('USER_TRANSACTION','REALUSERID');
   new.Log_CURRENT_ROLE    = CURRENT_ROLE;
   new.Log_SESSION_ID      = CURRENT_CONNECTION;
   new.Log_TRANSACTION_ID  = CURRENT_TRANSACTION;
