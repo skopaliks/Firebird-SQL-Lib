@@ -11,6 +11,7 @@
 * 2020-04-30 S.Skopalik  - Fixed too many spaces in trigger comments
 * 2022-11-22 S.Skopalik  - Added possibility to update table records with empty trigger
 *                          in replication mode, add TRIM for improve output quality
+* 2023-04-10 S.Skopalik  - Fixed Transaction roll back trigger extraction                         
 ******************************************************************************/
 SET TERM ^;
 
@@ -41,7 +42,7 @@ BEGIN
   IF(trigger_type IS NULL) THEN EXCEPTION LIB$CMP_Exception 'Trigger ''' || TRIM(TriggerName) || ''' not found.';
   IF(trigger_inactive = 1) THEN
     DDL = DDL || ' INACTIVE ';
-  IF(trigger_type IN (8192, 8193, 8194, 8195)) THEN
+  IF(trigger_type IN (8192, 8193, 8194, 8195, 8196)) THEN
     DDL = DDL || (SELECT TriggerType FROM LIB$CMP_GetTriggerType(:trigger_type));
    ELSE
      DDL = DDL || ' FOR ' || (SELECT TRIM(RDB$Relation_Name) FROM RDB$Triggers WHERE RDB$Trigger_Name = :TriggerName) || ' ' || (SELECT TriggerType FROM LIB$CMP_GetTriggerType(:trigger_type));
