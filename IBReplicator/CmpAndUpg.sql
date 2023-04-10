@@ -67,7 +67,7 @@ BEGIN
     SUSPEND;
   END
   -- Adjust NOT NULL flag
-  FOR SELECT TRIM(Table_Name), TRIM(Field_Name), TRIM(Field_Source), Field_Null FROM  LIB$CMP_Tables(:db, 'sysdba', 'masterkey')
+  FOR SELECT TRIM(Table_Name), TRIM(Field_Name), TRIM(Field_Source), Field_Null FROM  LIB$CMP_Tables(:db, :UserName, :UserPass)
     WHERE IsFieldMissing = 0 AND IsTableMissing = 0 AND Field_Null <> Field_null_Target
     INTO tbl, fld, fsd, fnull DO BEGIN
     line = 'EXECUTE PROCEDURE MASA$Set_Null_Flag('''||tbl||''', '''||fld||''', '||fNull||');';
