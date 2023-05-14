@@ -9,7 +9,7 @@
 *                                                                               
 * Revision History                                                           
 * ================                                                           
-*                                                                            
+* 2023-05-14 Skopalik S    Do not skip static replication triggers                                                                           
 ******************************************************************************/
 SET TERM ^;
 
@@ -33,7 +33,8 @@ BEGIN
     FROM rdb$Triggers
     WHERE
       (rdb$System_Flag IS NULL OR rdb$System_Flag = 0)
-      AND rdb$Trigger_Name NOT LIKE 'REPL$%'
+      -- Exclude replicator triggers on tables. Format is REPL$<ReplNo>_<TargetDbNo>_<RelationNo>
+      AND rdb$Trigger_Name NOT SIMILAR TO 'REPL$[[:DIGIT:]]+_[[:DIGIT:]]+_[[:DIGIT:]]+[[:SPACE:]]*'
       AND rdb$Trigger_Name NOT LIKE :Skip_Triggers
     ORDER BY 1
     AS CURSOR Lt DO BEGIN
