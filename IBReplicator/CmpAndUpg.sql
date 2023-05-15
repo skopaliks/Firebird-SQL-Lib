@@ -121,14 +121,16 @@ BEGIN
     line = '-- Trigger ' || TRIM(tc.Trigger_Name) || ' target code:';
     SUSPEND;
     FOR SELECT '--'||result FROM Tokenize(tc.Target_Source, ASCII_CHAR(10)) INTO line DO BEGIN
+      line = TRIM(ASCII_CHAR(13) FROM line);
       SUSPEND;
     END
-    line = 'INSERT INTO Repl$DDL(SQL) VALUES(''';
+    line = 'INSERT INTO Repl$DDL(SQL) VALUES(';
     SUSPEND;
     FOR SELECT REPLACE(result,'''','''''') FROM Tokenize(tc.DDL, ASCII_CHAR(10)) INTO line DO BEGIN
+      line = ''''||TRIM(ASCII_CHAR(13) FROM line)||'''||ASCII_CHAR(10)||';
       SUSPEND;
     END
-    line = ''');';
+    line = ''''');';
     SUSPEND;
   END
   line = 'COMMIT;';

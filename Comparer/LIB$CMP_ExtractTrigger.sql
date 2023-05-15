@@ -11,7 +11,8 @@
 * 2020-04-30 S.Skopalik  - Fixed too many spaces in trigger comments
 * 2022-11-22 S.Skopalik  - Added possibility to update table records with empty trigger
 *                          in replication mode, add TRIM for improve output quality
-* 2023-04-10 S.Skopalik  - Fixed Transaction roll back trigger extraction                         
+* 2023-04-10 S.Skopalik  - Fixed Transaction roll back trigger extraction
+* 2023-05-15 S.Skopalik  - Fixed missing space before ON ... triggers
 ******************************************************************************/
 SET TERM ^;
 
@@ -43,7 +44,7 @@ BEGIN
   IF(trigger_inactive = 1) THEN
     DDL = DDL || ' INACTIVE ';
   IF(trigger_type IN (8192, 8193, 8194, 8195, 8196)) THEN
-    DDL = DDL || (SELECT TriggerType FROM LIB$CMP_GetTriggerType(:trigger_type));
+    DDL = DDL || ' ' || (SELECT TriggerType FROM LIB$CMP_GetTriggerType(:trigger_type));
    ELSE
      DDL = DDL || ' FOR ' || (SELECT TRIM(RDB$Relation_Name) FROM RDB$Triggers WHERE RDB$Trigger_Name = :TriggerName) || ' ' || (SELECT TriggerType FROM LIB$CMP_GetTriggerType(:trigger_type));
   IF(trigger_sequence > 0) THEN
@@ -56,7 +57,7 @@ BEGIN
   IF(EmptyBody = 0)THEN BEGIN
     SELECT RDB$TRIGGER_SOURCE, RDB$DESCRIPTION FROM RDB$Triggers WHERE RDB$Trigger_Name = :TriggerName
         INTO :Source, :dsc;
-    DDL = DDL || Source;
+    DDL = DDL || TRIM(Source);
   END
   ELSE
     DDL = DDL || 'AS' || CRLF || 
