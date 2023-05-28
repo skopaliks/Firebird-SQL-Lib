@@ -22,6 +22,9 @@ BEGIN
     EXCEPTION LIB$CMP_EXCEPTION 'Extracted trigger source is different';
   IF(t_dsc <> (SELECT CAST(ddl AS VARCHAR(1000)) FROM LIB$CMP_ExtractTrigger('TEST_TRIGGER_BIU', 0) WHERE isComment = 1)) THEN
     EXCEPTION LIB$CMP_EXCEPTION 'Extracted trigger comment is different';
+  -- Test Transaction Rollback troggers
+  IF((SELECT CAST(COALESCE(ddl, 'NULL') AS VARCHAR(1000)) FROM LIB$CMP_ExtractTrigger('LIB$TR_MONITOR_ROLLBACK', 0) WHERE isBody = 1) NOT LIKE '%IN AUTONOMOUS TRANSACTION DO BEGIN%' ) THEN
+    EXCEPTION LIB$CMP_EXCEPTION 'Extraction of roll back trigger failed';
 END
 ^
 SET TERM ;^

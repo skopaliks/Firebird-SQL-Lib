@@ -49,5 +49,6 @@ INPUT Comparer\LIB$CMP_Domains.sql;
 INPUT Comparer\LIB$CMP_Privileges.sql;
 INPUT Comparer\LIB$CMP_Procedures.sql;
 INPUT Comparer\LIB$CMP_Tables.sql;
+INPUT Comparer\LIB$CMP_Triggers.sql;
 
 COMMIT;
