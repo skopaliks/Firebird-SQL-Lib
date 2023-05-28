@@ -9,6 +9,7 @@
 * Revision History
 * 2017-09-15 - S.Skopalik: LIB$LargeText added
 * 2018-08-23 - S.Skopalik: LIB$UUID added for storing UUID
+* 2023-05-28 - S.Skopalik: Added LIB$Time_Zone for storing string time zone representation in FB4
 ******************************************************************************/
 
 -- because create or alter domain doesn't exist
@@ -48,6 +49,11 @@ BEGIN
   WHEN ANY DO BEGIN END
   END
   ds = 'CREATE DOMAIN LIB$UUID AS CHAR(16) CHARACTER SET OCTETS';
+  BEGIN
+    EXECUTE STATEMENT ds;
+  WHEN ANY DO BEGIN END
+  END
+  ds = 'CREATE DOMAIN LIB$Time_Zone AS CHAR(63) CHECK(EXISTS(select * from RDB$TIME_ZONES WHERE RDB$TIME_ZONE_NAME = VALUE) OR VALUE SIMILAR TO ''(\+|\-){1}[[:DIGIT:]]{2}:[[:DIGIT:]]{2}[[:SPACE:]]*'' ESCAPE ''\'')';
   BEGIN
     EXECUTE STATEMENT ds;
   WHEN ANY DO BEGIN END

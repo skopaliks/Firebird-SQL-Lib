@@ -1,5 +1,7 @@
 -- Install all necesary DB object
 
+CREATE EXCEPTION LIB$QA_Fail 'QA test failed';
+
 -- IBReplicator config
 INPUT c:\IBReplicator\config.sql;
 SET TERM ;^

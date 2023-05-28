@@ -48,6 +48,9 @@ CALL ..\AddToDB.bat %DATABASE%
 %ISQL% -b -e -i Test_ChangeDataType.sql %DATABASE%
 @IF %ERRORLEVEL% NEQ 0 goto :end
 
+%ISQL% -b -e -i Test_Domains.sql %DATABASE%
+@IF %ERRORLEVEL% NEQ 0 goto :end
+
 %ISQL% -b -e -i Test_ExtractorProcedure.sql %DATABASE%
 @IF %ERRORLEVEL% NEQ 0 goto :end
 
