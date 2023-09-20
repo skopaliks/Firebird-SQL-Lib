@@ -13,6 +13,7 @@
 *                          in replication mode, add TRIM for improve output quality
 * 2023-04-10 S.Skopalik  - Fixed Transaction roll back trigger extraction
 * 2023-05-15 S.Skopalik  - Fixed missing space before ON ... triggers
+* 2023-09-19 S.Skopalik  - Fixed wrong setting of flag IsSource and IsBody
 ******************************************************************************/
 SET TERM ^;
 
@@ -40,18 +41,20 @@ BEGIN
   DDL = 'CREATE OR ALTER TRIGGER '|| TRIM(TriggerName);
   SELECT RDB$Trigger_Type, RDB$Trigger_Inactive, RDB$Trigger_Sequence FROM RDB$Triggers WHERE RDB$Trigger_Name = :TriggerName
     INTO trigger_type, trigger_inactive, trigger_sequence;
-  IF(trigger_type IS NULL) THEN EXCEPTION LIB$CMP_Exception 'Trigger ''' || TRIM(TriggerName) || ''' not found.';
-  IF(trigger_inactive = 1) THEN
-    DDL = DDL || ' INACTIVE ';
+  IF(trigger_type IS NULL) THEN EXCEPTION LIB$CMP_Exception 'Trigger ''' || TRIM(TriggerName) || ''' not found.';    
   IF(trigger_type IN (8192, 8193, 8194, 8195, 8196)) THEN
     DDL = DDL || ' ' || (SELECT TriggerType FROM LIB$CMP_GetTriggerType(:trigger_type));
-   ELSE
-     DDL = DDL || ' FOR ' || (SELECT TRIM(RDB$Relation_Name) FROM RDB$Triggers WHERE RDB$Trigger_Name = :TriggerName) || ' ' || (SELECT TriggerType FROM LIB$CMP_GetTriggerType(:trigger_type));
+   ELSE BEGIN
+     DDL = DDL || ' FOR ' || (SELECT TRIM(RDB$Relation_Name) FROM RDB$Triggers WHERE RDB$Trigger_Name = :TriggerName);
+     DDL = DDL || ' ' || TRIM( IIF( trigger_inactive = 1, 'INACTIVE', 'ACTIVE') );
+     DDL = DDL || ' ' || (SELECT TriggerType FROM LIB$CMP_GetTriggerType(:trigger_type));
+  END
   IF(trigger_sequence > 0) THEN
     DDL = DDL || ' POSITION ' || trigger_sequence;
   IsHeader = 1;
   SUSPEND;
   IsHeader = 0;
+  
   -- Extract trigger header with body
   DDL = DDL || CRLF;
   IF(EmptyBody = 0)THEN BEGIN
@@ -65,18 +68,18 @@ BEGIN
     '  IF(Rdb$Get_Context(''USER_SESSION'',''DatabaseReplicationFlag'') IS NOT NULL) THEN EXIT;' || CRLF || 
     '  EXCEPTION LIB$CMP_Exception ''Trigger '  || TRIM(TriggerName) || ' is not implemented'';' || CRLF || 
     'END';
-  IsBody = 1;
-  SUSPEND;
-  IsBody = 0;
-
-  -- Extract source
   IsSource = 1;
+  SUSPEND;
+  IsSource = 0;
+
+  -- Extract source (trigger body)
   IF(EmptyBody = 0) THEN BEGIN
     DDL = Source;
+    IsBody = 1;
     SUSPEND;
+    IsBody = 0;
   END
-  isSource = 0;
-
+  
   -- Extract drop statement
   isDrop = 1;
   DDL = 'DROP TRIGGER ' || TriggerName;

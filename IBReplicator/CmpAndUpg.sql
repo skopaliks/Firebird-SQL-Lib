@@ -1,11 +1,11 @@
 SET TERM ^;
 EXECUTE BLOCK
-RETURNS(line VARCHAR(300))
+RETURNS(line VARCHAR(500))
 AS
 
 -- https://www.tabsoverspaces.com/232347-tokenize-string-in-sql-firebird-syntax
 declare procedure Tokenize(input LIB$LargeText, token char(1))
-returns (result varchar(300))
+returns (result varchar(500))
 as
 declare newpos int;
 declare oldpos int;
