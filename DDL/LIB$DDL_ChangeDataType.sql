@@ -11,6 +11,7 @@
 * 2020-11-01 - S.Skopalik    In case of dependency then empty procedure bodies
 * 2022-11-20 - S.Skopalik    Add isDML flag to distinguish between DDL and DML statements, extend SQL length
 * 2022-11-21 - S.Skopalik    Add support to empty triggers bodies
+* 2024-10-17 - S.Skopalik    Fixed extraction of empty triggers
 ******************************************************************************/
 
 SET TERM ^;
@@ -45,7 +46,7 @@ BEGIN
         SQL = (SELECT DDL FROM Lib$Cmp_Extractprocedure(:D_Name, 1) WHERE IsBody = 1);      
       END
       IF(D_Type = 'TRIGGER')THEN BEGIN   -- Empty triggers bodies
-        SQL = (SELECT DDL FROM LIB$CMP_ExtractTrigger(:D_Name, 1) WHERE IsBody = 1);
+        SQL = (SELECT DDL FROM LIB$CMP_ExtractTrigger(:D_Name, 1) WHERE IsSource = 1);
       END
       IF(SQL IS NOT NULL)THEN BEGIN
         SUSPEND;
