@@ -22,6 +22,7 @@ INPUT Comparer\LIB$CMP_ExtractTrigger.sql;
 COMMIT;
 
 -- DDL
+INPUT DDL\LIB$DDL_TempTable.sql;
 INPUT DDL\LIB$DDL_ChangeDataType.sql;
 INPUT DDL\LIB$DDL_Exception.sql;
 INPUT DDL\LIB$DDL_DropForeignKey.sql;

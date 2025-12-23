@@ -33,9 +33,12 @@ DECLARE sql2 VARCHAR(512);
 DECLARE sql3 VARCHAR(512);
 DECLARE isRep SMALLINT;  -- Flag that replication flag is already sets
 DECLARE D_Name VARCHAR(128);
-DECLARE D_Type VARCHAR(128); 
+DECLARE D_Type VARCHAR(128);
+DECLARE tmp_id INTEGER; 
 BEGIN
+  DELETE FROM LIB$DDL_TempTable;
   isDML = 0;
+  tmp_id = 0;
   IF(DropDependency>0)THEN BEGIN
     FOR SELECT T.rdb$Type_Name, D.rdb$Dependent_Name FROM RDB$Dependencies D, RDB$Types T
       WHERE D.rdb$depended_on_name = :RelationName AND D.rdb$field_name = :FieldName
@@ -43,9 +46,15 @@ BEGIN
       INTO D_Type, D_Name DO BEGIN
       SQL = NULL;
       IF(D_Type = 'PROCEDURE')THEN BEGIN   -- Empty procedures bodies
+        INSERT INTO LIB$DDL_TempTable(id, SQL)
+          VALUES(:tmp_id, (SELECT DDL FROM Lib$Cmp_Extractprocedure(:D_Name, 0) WHERE IsBody = 1));
+        tmp_id = tmp_id + 1;
         SQL = (SELECT DDL FROM Lib$Cmp_Extractprocedure(:D_Name, 1) WHERE IsBody = 1);      
       END
       IF(D_Type = 'TRIGGER')THEN BEGIN   -- Empty triggers bodies
+        INSERT INTO LIB$DDL_TempTable(id, SQL)
+          VALUES(:tmp_id, (SELECT DDL FROM LIB$CMP_ExtractTrigger(:D_Name, 0) WHERE IsSource = 1));
+        tmp_id = tmp_id + 1;
         SQL = (SELECT DDL FROM LIB$CMP_ExtractTrigger(:D_Name, 1) WHERE IsSource = 1);
       END
       IF(SQL IS NOT NULL)THEN BEGIN
@@ -80,6 +89,12 @@ BEGIN
     EXECUTE STATEMENT sql3 WITH AUTONOMOUS TRANSACTION;
     EXECUTE STATEMENT SQL WITH AUTONOMOUS TRANSACTION;
     IF(isRep IS NULL)THEN Rdb$Set_Context('USER_SESSION','DatabaseReplicationFlag', NULL);
+  END
+  FOR SELECT SQL FROM LIB$DDL_TempTable ORDER BY id INTO SQL DO BEGIN
+    SUSPEND;
+    IF(Exe>0)THEN BEGIN
+      EXECUTE STATEMENT SQL WITH AUTONOMOUS TRANSACTION;
+    END
   END
 END
 ^
