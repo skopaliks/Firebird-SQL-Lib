@@ -12,6 +12,7 @@
 * 2022-11-20 - S.Skopalik    Add isDML flag to distinguish between DDL and DML statements, extend SQL length
 * 2022-11-21 - S.Skopalik    Add support to empty triggers bodies
 * 2024-10-17 - S.Skopalik    Fixed extraction of empty triggers
+* 2025-12-23 - S.Skopalik    Add restore procedure and trigger body after change
 ******************************************************************************/
 
 SET TERM ^;
