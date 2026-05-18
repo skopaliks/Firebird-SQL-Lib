@@ -31,35 +31,46 @@ ECHO SET SQL DIALECT 3;>%cfile%
 ECHO CREATE DATABASE '%DATABASE%' PAGE_SIZE 16384 DEFAULT CHARACTER SET UTF8; >>%cfile%
 
 %ISQL% -b -e -charset UTF8 -i %cfile%
-@IF %ERRORLEVEL% NEQ 0 goto :end
+@IF %ERRORLEVEL% NEQ 0 GOTO :error
 
 DEL %cfile%
-@IF %ERRORLEVEL% NEQ 0 goto :end
+@IF %ERRORLEVEL% NEQ 0 GOTO :error
 
 %ISQL% -b -e -q -i Create_Test_DB.sql %DATABASE% >create.log
-@IF %ERRORLEVEL% NEQ 0 goto :end
+@IF %ERRORLEVEL% NEQ 0 GOTO :error
 
 CALL ..\AddToDB.bat %DATABASE%
-@IF %ERRORLEVEL% NEQ 0 goto :end
+@IF %ERRORLEVEL% NEQ 0 GOTO :error
 
 %ISQL% -b -e -i Test_Repl$DDL.sql %DATABASE%
-@IF %ERRORLEVEL% NEQ 0 goto :end
+@IF %ERRORLEVEL% NEQ 0 GOTO :error
 
 %ISQL% -b -e -i Test_ChangeDataType.sql %DATABASE%
-@IF %ERRORLEVEL% NEQ 0 goto :end
+@IF %ERRORLEVEL% NEQ 0 GOTO :error
 
 %ISQL% -b -e -i Test_Domains.sql %DATABASE%
-@IF %ERRORLEVEL% NEQ 0 goto :end
+@IF %ERRORLEVEL% NEQ 0 GOTO :error
 
 %ISQL% -b -e -i Test_ExtractorProcedure.sql %DATABASE%
-@IF %ERRORLEVEL% NEQ 0 goto :end
+@IF %ERRORLEVEL% NEQ 0 GOTO :error
 
 %ISQL% -b -e -i Test_ExtractorTrigger.sql %DATABASE%
-@IF %ERRORLEVEL% NEQ 0 goto :end
+@IF %ERRORLEVEL% NEQ 0 GOTO :error
+
+%ISQL% -i Test_Tokenize.sql %DATABASE%
+@IF %ERRORLEVEL% NEQ 0 GOTO :error
 
 %ISQL% -i Drop_Test_DB.sql %DATABASE%
-@IF %ERRORLEVEL% NEQ 0 goto :end
+@IF %ERRORLEVEL% NEQ 0 GOTO :error
+
+@SET result=0
+GOTO :end
+
+:error
+@SET result=%ERRORLEVEL%
+@COLOR 0C
+@ECHO FAILED %result%  
 
 :end
-
 @POPD
+@EXIT /B %result%

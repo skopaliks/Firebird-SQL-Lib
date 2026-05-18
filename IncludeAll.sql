@@ -6,7 +6,8 @@ INPUT Domains\LIB$Domains.sql;
 INPUT DB_Checks\LIB$CheckTriggersPossitions.sql;
 COMMIT;
 
--- Monitoring
+-- Utils
+INPUT Utils\LIB$Tokenize.sql;
 INPUT Utils\LIB$TR_Monitor.sql;
 COMMIT;
 

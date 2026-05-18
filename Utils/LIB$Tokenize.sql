@@ -10,7 +10,7 @@
 * Revision History
 * ================
 ******************************************************************************/
-
+SET TERM ^;
 CREATE OR ALTER PROCEDURE LIB$Tokenize(Input LIB$LargeText, Token CHAR(1))
 RETURNS(result LIB$LargeText)
 AS
@@ -33,3 +33,5 @@ BEGIN
     END
   END
 END
+^
+SET TERM ;^
